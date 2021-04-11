@@ -47,3 +47,4 @@ All the optional marked use cases will be developed on top of the minimum requir
 
 ## 1.4 Front-End / Graphical User Interface
 
+Three pages/interractions: Create bet, list bets, accept bet.
