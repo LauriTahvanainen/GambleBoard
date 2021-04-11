@@ -43,7 +43,71 @@ All the optional marked use cases will be developed on top of the minimum requir
 
 ## 1.2 Implementation
 
+All bets are placed in ethereum. The Kleros integration is optional.
+
+Players can interact with the smart contract using the following interfaces:
+
+
+**CreateBet(betType, outcomes, odds, description, isArbitrable)**
+- A player creates a bet, giving all the necessary information about the bet. The bet is given an id (or the id given as parameter?) and it is saved into some data structure with all the necessary information. The data structure implementation should be discussed and tested, storage costs gas.
+- Can be chosen to be not arbitrable.
+- Emits a message
+- Returns if successful, betID
+
+
+**Bet(betID, outcome, value)**
+- A player buys a bet, saving the value given as parameter under the betID and outcome.
+- Returns if successful
+
+**VoteOnOutcome(betID, outcome)**
+- A player interacts with the contract to give their suggestion on the outcome of the bet
+- If all have given their suggestion the following happens:
+    
+    a: All players agree and the value is distributed to the winner
+    
+    b: Players do not agree, the stakes are returned to players.
+    
+    c: Players do not agree and a dispute is created to Kleros
+        -For this there needs to be a fee deposited for Kleros, but this can’t be done
+ without paying an arbitration fee, this means that the last person giving their 
+ suggestion should pay the fee if it has to be paid. The problem with this is
+ that transactions in one block can be calculated in any order and two players
+ might vote at the same time both thinking they are not last, thus not providing 
+ the arbitration fee.
+ 
+- One possibility is to just put the bet into a dispute state and then wait for one
+ player to call CreateDispute.
+- Returns if successful
+
+**CreateDispute(betID, fee)**
+- A player creates a dispute about a bet.
+- Returns if successful
+
+**SubmitEvidence(betID, evidence)**
+- A player submits evidence on the dispute of a bet. Is done by emitting.
+- ?? Could possibly also be done such that the evidence is given with bet creation, and each player that buys the bet accepts that this will be provided as evidence. This way no need for all to make evidence transactions. On the other hand, again more storage.
+
+The smart contract should implement IArbitrable and IEvidence to communicate with Kleros. 
+With this the contract has to implement the events
+
+MetaEvidence, Evidence, Dispute and Ruling
+
+And the function
+
+**rule(uint256 _disputeID, uint256 _ruling) external**
+- Is called by the arbitrator to give a ruling on the bet
+- Distribute value to players of the bet according to the ruling.
+
+## Issues
+
+- Storage: what would not be needed to store in the contract? What could be for example handled with the front-end using events? One possibility would also be to create a new contract for each bet. What is the cheapest option gaswise?
+- Can this be expanded to parimutuel betting? I’d say yes, with the exact same interfaces. Bookmaker betting would be another story.
+- Category information also for the front end? Private/public value? Somehow the bets should be enumerated for showing in the front-end. Just reading transactions and logs?
+
+
 ## 1.3 Software Architecture
+
+![](https://github.com/LauriTahvanainen/GambleBoard/blob/main/documentation/diagram.png)
 
 ## 1.4 Front-End / Graphical User Interface
 
