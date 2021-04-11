@@ -107,7 +107,7 @@ And the function
 
 ## 1.3 Software Architecture
 
-![](https://github.com/LauriTahvanainen/GambleBoard/blob/main/documentation/diagram.png)
+![Smart contract interactions](https://github.com/LauriTahvanainen/GambleBoard/blob/main/documentation/diagram.png)
 
 ## 1.4 Front-End / Graphical User Interface
 
