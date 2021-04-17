@@ -25,6 +25,7 @@
 - 1 player / outcome
 - Enter amount of ether and outcome selected by the creator
 - Fixed odds
+- Fixed stake
 - Creator defines: Odds, Match description, deadline
 - Given by UI: Outcomes, Categories, Type
 
@@ -33,6 +34,7 @@
 |As a user I want to be able to place a bet on “back” bet pools|Ronin||||
 - Display and selection of  a league on which I want to bet
 - On “Back” bets the stake is given automatically.
+- Fixed stake, accepting the odds of the creator of the bet
 
 |Goal|Dev|Workload|Deadline|Done|
 |----|---|--------|--------|----|
@@ -53,6 +55,7 @@
 |----|---|--------|--------|----|
 |As a user I want to be able to create a parimutuel bet pool (Optional)|DevX||||
 - N players / outcome
+- Any amount of stake
 - Enter amount of ether and outcome selected by the creator
 - Rewards by distribution of bets, dynamic odds
 - Creator defines: Outcomes, Match description, deadline
