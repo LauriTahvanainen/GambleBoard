@@ -10,6 +10,7 @@
 -Ability to create a bet under a category 
 -Ability to use “lay bet” button which will lead to a MetaMask popup → Confirm or Reject the current transaction. 
 -Confirmation: bet will be listed under the upcoming bets, so that other users can back the bet.
+
 |Goal|Dev|Workload|Deadline|Done|
 |----|---|--------|--------|----|
 |As a user I want see my Betting history|Ronin||||
