@@ -38,7 +38,7 @@ Parimutual bets
 Next step would be to offer Parimutual bets on our platform. Parimutual bets can also be layed and backed. The same rules that are defined for P2P bets apply for Parimutual bets.
 
 ## Use case summary
-The minimum requirement is thus for the players to be able to create 1v1 "back" and "lay" bets, for which the result is agreed upon between the players. The winning are spread accordingly according to the agreement of the players. The smart constract allows creation of any kind of bets, but the minimum requirement for the user interface is that there are matches offered in the UI to the players, and from those matches the players can create bets with their preferred odds. The players can also open a listing of created bets where they can select what match to bet on and with what odds.
+The minimum requirement is thus for the players to be able to create 1v1 "back" and "lay" bets, for which the result is agreed upon between the players. The winning are spread accordingly according to the agreement of the players. Without Kleros, in a case of dispute the players bets are returned. The smart constract allows creation of any kind of bets, but the minimum requirement for the user interface is that there are matches offered in the UI to the players, and from those matches the players can create bets with their preferred odds. The players can also open a listing of created bets where they can select what match to bet on and with what odds.
 All the optional marked use cases will be developed on top of the minimum requirements if there is sufficient time. These include for example the Kleros arbitration for disagreements and the possibility to create any kind of bet in the UI.
 
 ## 1.2 Implementation
