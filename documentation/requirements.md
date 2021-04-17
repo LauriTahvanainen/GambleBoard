@@ -2,7 +2,7 @@
 
 Martin Frick, Md Rezuanul Haque, Ronin Chellakudam, Lauri Tahvanainen
 
-Department of Informatics IfI University of Zurich UZH
+Department of Informatics IfI University of Zurich UZH, Blockchains and Overlay Networks Spring 2021 Challenge Task
 
 
 ## 1.1 Use case
