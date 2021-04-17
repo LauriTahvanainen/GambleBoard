@@ -41,7 +41,8 @@
 |As a user I want to vote on the outcome|Martin||||
 - Receive back the bet-money if dispute without Kleros
 - If there are no bets on the actual outcome, there is a refund
-- Automatical reward distribution in case of agreement
+- Automatical reward distribution in case of agreement?
+- Automatic distribution might be a problem with Parimutuel betting when there are many players. Dividing the winnings would have to be done in a costly loop. A claim winnings function in this scenario?
 
 
 |Goal|Dev|Workload|Deadline|Done|
