@@ -7,9 +7,9 @@
 - Single bet information shown: Description, Outcome, Odds, Available to stake
 - Clicking on outcome starts the transaction
 - Ability to create a new bet from the listing page.
--Ability to create a bet under a category 
--Ability to use “lay bet” button which will lead to a MetaMask popup → Confirm or Reject the current transaction. 
--Confirmation: bet will be listed under the upcoming bets, so that other users can back the bet.
+- Ability to create a bet under a category 
+- Ability to use “lay bet” button which will lead to a MetaMask popup → Confirm or Reject the current transaction. 
+- Confirmation: bet will be listed under the upcoming bets, so that other users can back the bet.
 
 |Goal|Dev|Workload|Deadline|Done|
 |----|---|--------|--------|----|
