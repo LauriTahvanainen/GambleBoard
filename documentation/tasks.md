@@ -55,8 +55,8 @@
 - N players / outcome
 - Enter amount of ether and outcome selected by the creator
 - Rewards by distribution of bets, dynamic odds
--Creator defines: Outcomes, Match description, deadline
--Given by UI: Categories, Type
+- Creator defines: Outcomes, Match description, deadline
+- Given by UI: Categories, Type
 
 |Goal|Dev|Workload|Deadline|Done|
 |----|---|--------|--------|----|
