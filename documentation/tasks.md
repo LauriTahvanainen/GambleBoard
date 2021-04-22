@@ -5,7 +5,8 @@
 |As a user I want a Homepage where I can search listed bets|Rez||||
 - Categories by Country, Sport, League
 - Single bet information shown: Description, Outcome, Odds, Available to stake
-- Clicking on outcome starts the transaction
+- Only outcomes which have not been played available. e.g. on basic back-lay with 2 outcomes, only opposite of creator bet playable.
+- Clicking on outcomes odd starts the transaction
 - Ability to create a new bet from the listing page.
 - Ability to create a bet under a category 
 - Ability to use “lay bet” button which will lead to a MetaMask popup → Confirm or Reject the current transaction. 
@@ -34,6 +35,7 @@
 |As a user I want to be able to place a bet on “back” bet pools|Ronin||||
 - Display and selection of  a league on which I want to bet
 - On “Back” bets the stake is given automatically.
+- Only those outcomes that the creator or another player has not played available to bet on. 1 bet / outcome.
 - Fixed stake, accepting the odds of the creator of the bet
 
 |Goal|Dev|Workload|Deadline|Done|
