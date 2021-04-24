@@ -34,17 +34,15 @@
 |----|---|--------|--------|----|
 |As a user I want to be able to place a bet on “back” bet pools|Ronin||||
 - Display and selection of  a league on which I want to bet
-- On “Back” bets the stake is given automatically.
-- Only those outcomes that the creator or another player has not played available to bet on. 1 bet / outcome.
-- Fixed stake, accepting the odds of the creator of the bet
+- Odd and fixed stake shown.
+- 1 backer / bet.
 
 |Goal|Dev|Workload|Deadline|Done|
 |----|---|--------|--------|----|
 |As a user I want to vote on the outcome|Martin||||
 - Receive back the bet-money if dispute without Kleros
-- If there are no bets on the actual outcome, there is a refund
-- Automatical reward distribution in case of agreement?
-- Automatic distribution might be a problem with Parimutuel betting when there are many players. Dividing the winnings would have to be done in a costly loop. A claim winnings function in this scenario?
+- If there is not backer creator withdraws own stake.
+- Automatical reward distribution in case of agreement or withdraw for winner?
 
 
 |Goal|Dev|Workload|Deadline|Done|
@@ -69,6 +67,7 @@
 |As a user I want to be able to place a bet on parimutuel bet pools (Optional)|DevX||||
 - Display and selection of  a league on which I want to bet
 - Stake given by user.
+- Automatic distribution might be a problem with Parimutuel betting when there are many players. Dividing the winnings would have to be done in a costly loop. A claim winnings function in this scenario?
 
 |Goal|Dev|Workload|Deadline|Done|
 |----|---|--------|--------|----|
