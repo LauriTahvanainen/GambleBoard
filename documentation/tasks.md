@@ -41,7 +41,9 @@
 |----|---|--------|--------|----|
 |As a user I want to vote on the outcome|Martin||||
 - Receive back the bet-money if dispute without Kleros
-- If there is not backer creator withdraws own stake.
+- If there is not a backer, creator can withdraw own stake.
+- Option for voting undecidable e.g. for cancelled matches.
+- If disagreement -> contract to dispute state
 - Automatical reward distribution in case of agreement or withdraw for winner?
 
 
