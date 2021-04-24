@@ -10,7 +10,7 @@ Department of Informatics IfI University of Zurich UZH, Blockchains and Overlay 
 Our goal is to create a platform (DApp) where players can bet against each other without a centralized provider demanding a commission in between. The type of bets we offer are “back”- and “lay”-bets. (https://www.livetipsportal.com/en/betting-strategies/back-lay/). The players have the possibility to back or to lay a bet which allows them to either offer a bet to other players or to accept a bet another player has offered.
 
 The bet can be almost on any type of event. A champions league football match, a beer league ice hockey match, a political event or even a funny bet with a friend about being able to throw a ping pong ball in to a glass while blind. The way we can achieve having bets of so many types is through having the default situation be that the players agree on the outcome of the event. 
-After a bet has been layed, the players stake is frozen until the bet is over or removed. A user who lays a bet also has to decide on some options. These include: the outcomes, the odds, the stake on one outcome from the creator and a description of the bet. By deciding the odds of the outcomes and betting on one of these outcomes the layer also fixes the possible stake on the other outcomes. 
+After a bet has been layed, the players stake is frozen until the bet is over or removed. A user who lays a bet also has to decide on some options. These include: the outcomes, the odds, the stake on one outcome from the creator and a description of the bet. By deciding the odds of the outcomes and betting on one of these outcomes the layer also fixes the possible stake on the other outcome. 
 
 There are following options: just upon agreement, one agreement with  (*Opt*) Kleros and an (*Opt*) oracle with Kleros. When the latter is chosen, the users do have to agree on an oracle. When the result is disputed, each player has the ability to provide evidence about the right outcome.
 
@@ -38,7 +38,7 @@ Parimutual bets
 Next step would be to offer Parimutual bets on our platform. Parimutual bets can also be layed and backed. The same rules that are defined for P2P bets apply for Parimutual bets.
 
 ## Use case summary
-The minimum requirement is thus for the players to be able to create 1v1 "back" and "lay" bets, for which the result is agreed upon between the players. The winning are spread accordingly according to the agreement of the players. Without Kleros, in a case of dispute the players bets are returned. The smart constract allows creation of any kind of bets, but the minimum requirement for the user interface is that there are matches offered in the UI to the players, and from those matches the players can create bets with their preferred odds. The players can also open a listing of created bets where they can select what match to bet on and with what odds.
+The minimum requirement is thus for the players to be able to create 1v1 "back" and "lay" bets, for which the result is agreed upon between the players. The winning are spread accordingly according to the agreement of the players. Without Kleros, in a case of dispute the players bets are returned. The smart constract allows creation of any kind of bets, but the minimum requirement for the user interface is that there are match templates offered in the UI to the players, and from those matches the players can create bets with their preferred odds. The players can also open a listing of created bets where they can select what match to bet on and with what odds.
 All the optional marked use cases will be developed on top of the minimum requirements if there is sufficient time. These include for example the Kleros arbitration for disagreements and the possibility to create any kind of bet in the UI.
 
 ## 1.2 Implementation
@@ -48,18 +48,24 @@ All bets are placed in ethereum. The Kleros integration is optional.
 Players can interact with the smart contract using the following interfaces:
 
 
-**CreateBet(betType, outcomes, odds, description, isArbitrable)**
-- A player creates a bet, giving all the necessary information about the bet. The bet is given an id (or the id given as parameter?) and it is saved into some data structure with all the necessary information. The data structure implementation should be discussed and tested, storage costs gas.
-- Can be chosen to be not arbitrable.
-- Emits a message
-- Returns if successful, betID
+// back and lay
+**createBet(description,
+            creatorBetDescription,
+            country,
+            category,
+            league,
+            stakingDeadline,
+            timeToVote,
+            creatorOdd)**
+- A player creates a bet, giving all the necessary information about the bet. The bet is given an unique ID and it is saved into a mapping with all the necessary information.
+- Can be chosen to be not arbitrable. (OPTIONAL)
+- Emits a message with indexes on some data, for example the bet ID
 
 
-**Bet(betID, outcome, value)**
+**bet(betID, outcome, value)**
 - A player buys a bet, saving the value given as parameter under the betID and outcome.
-- Returns if successful
 
-**VoteOnOutcome(betID, outcome)**
+**voteOnOutcome(betID, outcome)**
 - A player interacts with the contract to give their suggestion on the outcome of the bet
 - If all have given their suggestion the following happens:
     
@@ -68,24 +74,13 @@ Players can interact with the smart contract using the following interfaces:
     b: Players do not agree, the stakes are returned to players.
     
     c: Players do not agree and a dispute is created to Kleros
-        -For this there needs to be a fee deposited for Kleros, but this can’t be done
- without paying an arbitration fee, this means that the last person giving their 
- suggestion should pay the fee if it has to be paid. The problem with this is
- that transactions in one block can be calculated in any order and two players
- might vote at the same time both thinking they are not last, thus not providing 
- the arbitration fee.
- 
-- One possibility is to just put the bet into a dispute state and then wait for one
- player to call CreateDispute.
-- Returns if successful
+        - Bet goes into dispute state and one player can send it to Kleros with createDispute, locking a dispute resolution fee.
 
-**CreateDispute(betID, fee)**
+**createDispute(betID, fee)**
 - A player creates a dispute about a bet.
-- Returns if successful
 
 **SubmitEvidence(betID, evidence)**
 - A player submits evidence on the dispute of a bet. Is done by emitting.
-- ?? Could possibly also be done such that the evidence is given with bet creation, and each player that buys the bet accepts that this will be provided as evidence. This way no need for all to make evidence transactions. On the other hand, again more storage.
 
 The smart contract should implement IArbitrable and IEvidence to communicate with Kleros. 
 With this the contract has to implement the events
