@@ -73,7 +73,7 @@ Players can interact with the smart contract using the following interfaces:
     
     b: Players do not agree, the stakes are returned to players.
     
-    c: Players do not agree and a dispute is created to Kleros
+    c: Players do not agree and the bet is moved to dispute state
         - Bet goes into dispute state and one player can send it to Kleros with createDispute, locking a dispute resolution fee.
 
 **createDispute(betID, fee)**
