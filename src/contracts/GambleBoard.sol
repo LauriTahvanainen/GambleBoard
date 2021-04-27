@@ -1,6 +1,10 @@
+
 // SPDX-License-Identifier: GPL-3.0
 
 pragma solidity >=0.8.0 <0.9.0;
+
+
+import "../dependencies/Arbitrable.sol";
 
 /**
  * @title Gambleboard
@@ -12,7 +16,7 @@ pragma solidity >=0.8.0 <0.9.0;
  * resolved:          2
  * disputed:          3
  */
-contract Gambleboard {
+contract Gambleboard is Arbitrable {
     
     uint8 constant STATE_OPEN = 0;
     uint8 constant STATE_VOTING = 1;
@@ -24,6 +28,8 @@ contract Gambleboard {
     uint constant MIN_ODD = 1000000;
     uint constant MIN_STAKE = 1000000;
     uint constant MIN_TIME_TO_VOTE = 86400;
+    
+    enum RulingOptions {RefusedToArbitrate, creatorWins, backerWins}
     
     // Indexed params can be filtered in the UI.
     event BetCreated(bytes indexed betID, bytes betIDData, uint8 indexed country, uint16 indexed category, uint8 league, uint backerStake);
@@ -42,6 +48,8 @@ contract Gambleboard {
     
     mapping(bytes => Bet) public bets;
     mapping(address => uint32) public betsCreated;
+    
+    constructor(Arbitrator _arbitrator, bytes memory _arbitratorExtraData) Arbitrable(_arbitrator, _arbitratorExtraData) {}
     
     /**
      * Creates a new bet. Calculates the amount a backer has to stake from the creators stake and odd.
@@ -96,17 +104,22 @@ contract Gambleboard {
         return true;
     }
     
+    
+    
     function placeBet(bytes memory betID) payable public returns (bool) {
         
     }
     
+    function executeRuling(uint _disputeID, uint _ruling) override internal {
+        int i = 0;
+    }
     
-    //Fallback functions if someone sends ether to the contract address
+    //Fallback functions if someone only sends ether to the contract address
     fallback () external payable {
-        revert("Cant send Ether to contract!");
+        revert("Cant send Ether to contract address!");
     }
     
     receive () external payable {
-        revert("Cant send ether to contract!");
+        revert("Cant send ether to contract address!");
     }
 }
