@@ -40,7 +40,7 @@
 |Goal|Dev|Workload|Deadline|Done|
 |----|---|--------|--------|----|
 |As a user I want to vote on the outcome|Martin||||
-- Receive back the bet-money if dispute without Kleros
+- Receive back the bet-money if dispute without Kleros (or able to claim winning with another transaction)
 - If there is not a backer, creator can withdraw own stake.
 - Option for voting undecidable e.g. for cancelled matches.
 - If disagreement -> contract to dispute state
