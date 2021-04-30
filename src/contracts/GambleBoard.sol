@@ -4,7 +4,7 @@
 pragma solidity >=0.8.0 <0.9.0;
 
 
-import "../dependencies/Arbitrable.sol";
+import "./dependencies/Arbitrable.sol";
 
 /**
  * @title Gambleboard
@@ -16,7 +16,7 @@ import "../dependencies/Arbitrable.sol";
  * resolved:          2
  * disputed:          3
  */
-contract Gambleboard is Arbitrable {
+contract GambleBoard is Arbitrable {
     
     uint8 constant STATE_OPEN = 0;
     uint8 constant STATE_VOTING = 1;
@@ -30,6 +30,7 @@ contract Gambleboard is Arbitrable {
     uint constant MIN_TIME_TO_VOTE = 86400;
     
     enum RulingOptions {RefusedToArbitrate, creatorWins, backerWins}
+    uint constant amountOfRulingOptions = 2; // 0 if can't arbitrate
     
     // Indexed params can be filtered in the UI.
     event BetCreated(bytes indexed betID, bytes betIDData, uint8 indexed country, uint16 indexed category, uint8 league, uint backerStake);
@@ -40,6 +41,7 @@ contract Gambleboard is Arbitrable {
         uint256 backerStake;
         uint256 amountStaked;
         uint8 state;
+        RulingOptions outcome;
         address payable creator;
         address payable backer;
         string description;
@@ -48,6 +50,7 @@ contract Gambleboard is Arbitrable {
     
     mapping(bytes => Bet) public bets;
     mapping(address => uint32) public betsCreated;
+    mapping(uint => bytes) private disputeIDToBetID;
     
     constructor(Arbitrator _arbitrator, bytes memory _arbitratorExtraData) Arbitrable(_arbitrator, _arbitratorExtraData) {}
     
@@ -105,13 +108,29 @@ contract Gambleboard is Arbitrable {
     }
     
     
-    
     function placeBet(bytes memory betID) payable public returns (bool) {
         
     }
     
+    function voteOnOutcome(bytes memory betID, uint outcome) public {
+        
+    }
+    
+    function resolveBet(bytes memory betID, uint outcome) private {
+        
+    }
+    
+    function claimWinnings(bytes memory betID) public {
+        
+    }
+    
+    function createDispute(bytes memory betID) public {
+        
+    }
+    
     function executeRuling(uint _disputeID, uint _ruling) override internal {
-        int i = 0;
+        resolveBet(disputeIDToBetID[_disputeID], _ruling);
+        emit Ruling(arbitrator, _disputeID, _ruling);
     }
     
     //Fallback functions if someone only sends ether to the contract address
