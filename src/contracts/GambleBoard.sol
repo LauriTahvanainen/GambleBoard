@@ -122,12 +122,6 @@ contract GambleBoard is Arbitrable {
             block.timestamp > placingBet.stakingDeadline,
             "The bet match has expired, we are sorry!"
             );
-
-        //check that the state is open
-        require(
-            placingBet.state == STATE_OPEN,
-            "The bet is not open!"
-            );
         
         //check that no one else betted before
         require(
