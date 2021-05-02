@@ -115,7 +115,36 @@ contract GambleBoard is Arbitrable {
     
     
     function placeBet(bytes memory betID) payable public returns (bool) {
+        Bet storage placingBet = bets[betID];
         
+        //check that the state is open
+        require(
+            placingBet.state == STATE_OPEN,
+            "The bet is not open!"
+            );
+            
+         //make sure that the bet is not done after the Deadline
+        require(
+            block.timestamp > placingBet.stakingDeadline,
+            "The bet match has expired, we are sorry!"
+            );
+        
+        //check that no one else betted before
+        require(
+            placingBet.backer == 0,
+            "We have a backer already"
+            );
+        
+        //bet must be equal to the amount specified during the creation for the Bet
+        require(
+            msg.value == placingBet.backerStake,
+            "The amount you stacked is not valid!"
+            );
+
+        placingBet.backer = payable(msg.sender);       
+        placingBet.state = STATE_VOTING;
+        
+        return true;
     }
     
     function voteOnOutcome(bytes memory betID, uint outcome) public {
