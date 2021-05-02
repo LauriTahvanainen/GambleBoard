@@ -131,14 +131,14 @@ contract GambleBoard is Arbitrable {
         
         //check that no one else betted before
         require(
-            placingBet.backer == 0,
+            placingBet.backer == address(0x0),
             "We have a backer already"
             );
         
         //bet must be equal to the amount specified during the creation for the Bet
         require(
             msg.value == placingBet.backerStake,
-            "The amount you stacked is not valid!"
+            "The amount you staked is not valid!"
             );
 
         placingBet.backer = payable(msg.sender);       
