@@ -4,12 +4,16 @@
 |----|---|--------|--------|----|
 |As a user I want a Homepage where I can search listed bets|Rez||||
 - Categories by Country, Sport, League
-- Single bet information shown: Description, Outcome, Odds, Available to stake
-- Only outcomes which have not been played available. e.g. on basic back-lay with 2 outcomes, only opposite of creator bet playable.
-- Clicking on outcomes odd starts the transaction
-- Ability to create a new bet from the listing page.
-- Ability to create a bet under a category 
-- Ability to use “lay bet” button which will lead to a MetaMask popup → Confirm or Reject the current transaction. 
+- First visit all (or e.g. max 100) upcoming bets listed.
+- Events (Bet descriptions with open bets) listed
+  - Clicking on event shows the list of open bets under that event
+- Open bet information shown: Description, Outcome, Odds, deadline to stake, available to stake
+- Ability to back a bet, playing on the opposite outcome of the outcome description.
+  - Clicking on outcomes odd starts the transaction
+- Creating a bet saves the description to the UI
+  - Other players can create new bets under this saved description 
+- Ability to lay a new bet from the listing page completely from scratch, selecting country, category, league.
+- Ability to lay a new bet when under a country/category/league. Selects the country/category/league for the new bet.
 - Confirmation: bet will be listed under the upcoming bets, so that other users can back the bet.
 
 |Goal|Dev|Workload|Deadline|Done|
