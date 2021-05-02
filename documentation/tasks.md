@@ -2,14 +2,16 @@
 
 |Goal|Dev|Workload|Deadline|Done|
 |----|---|--------|--------|----|
-|As a user I want a Homepage where I can search listed bets|Rez||||
+|As a user I want a Homepage where I can search listed event and bets under those events |Rez||||
 - Categories by Country, Sport, League
-- First visit all (or e.g. max 100) upcoming bets listed.
-- Events (Bet descriptions with open bets) listed
-  - Clicking on event shows the list of open bets under that event
-- Open bet information shown: Description, Outcome, Odds, deadline to stake, available to stake
+- Two view levels of an event. There can be many open bets on different outcomes under the same event: e.g. Basel vs Zurich
+  - More broad view of only event description: e.g. Zurich vs Basel
+  - More specific view of an open bet, possibly many of these under an event e.g. description: Zurich vs Basel, Outcome: Zurich wins, deadline: 20-02-2021 18:30, available stake: 20 eth, odd: 2.5
 - Ability to back a bet, playing on the opposite outcome of the outcome description.
   - Clicking on outcomes odd starts the transaction
+- On first visit show all (or e.g. max 100) upcoming bets listed.
+- Events (Bet descriptions with open bets) listed
+  - Clicking on event shows the list of open bets under that event
 - Creating a bet saves the description to the UI
   - Other players can create new bets under this saved description 
 - Ability to lay a new bet from the listing page completely from scratch, selecting country, category, league.
