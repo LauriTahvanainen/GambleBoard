@@ -57,7 +57,6 @@ contract GambleBoard is Arbitrable {
         bytes4 countryLeagueCategory;
         address payable creator;
         address payable backer;
-        address payable lastArbitrationFeeAddr;
         string description;
         string creatorBetDescription;
     }
@@ -130,7 +129,7 @@ contract GambleBoard is Arbitrable {
             
          //make sure that the bet is not done after the Deadline
         require(
-            block.timestamp > placingBet.stakingDeadline,
+            block.timestamp <= placingBet.stakingDeadline,
             "The bet match has expired, we are sorry!"
             );
         
@@ -168,12 +167,13 @@ contract GambleBoard is Arbitrable {
     // @title Creates a dispute in the arbitrator contract
     // Both players need to deposit arbitration fee. Arbitration fees go to the winner.
     // If the second player does not deposit arbitration fee in time, the first to deposit the fee wins.
+    // One player can pay the arbitration fee of both players.
     function depositArbitrationFee(uint betID) public payable {
         Bet storage bet = bets[betID];
         require(bet.state == STATE_DISAGREEMENT || bet.state == STATE_DISPUTED, "Bet not in disputed or disagreement state!");
-        require(msg.sender == bet.creator || msg.sender == bet.backer, "Only the players can send the bet to arbitration!");
+        require(msg.sender == bet.creator || msg.sender == bet.backer, "Only a players can send the bet to arbitration!");
         require(msg.value >= arbitrator.arbitrationCost("0x0"), "Not enough ETH to cover arbitration costs.");
-        
+
         if (bet.state == STATE_DISPUTED) {
             bet.totalStake += msg.value;
             arbitrator.createDispute{value: msg.value}(RULING_OPTIONS_AMOUNT, "");
@@ -181,7 +181,6 @@ contract GambleBoard is Arbitrable {
         } else {
             bet.totalStake += msg.value;
             bet.deadline = block.timestamp + ONE_DAY;
-            bet.lastArbitrationFeeAddr = payable(msg.sender);
             bet.state = STATE_DISPUTED;
         }
     }
