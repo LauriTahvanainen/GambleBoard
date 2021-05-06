@@ -11,7 +11,7 @@
 
 pragma solidity >=0.8.0 <0.9.0;
 
-import "../dependencies/Arbitrator.sol";
+import "../dep/Arbitrator.sol";
 
 /** @title Centralized Arbitrator
  *  @dev This is a centralized arbitrator deciding alone on the result of disputes. No appeals are possible.

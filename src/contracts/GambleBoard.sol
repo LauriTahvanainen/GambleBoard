@@ -3,7 +3,7 @@
 pragma solidity >=0.8.0 <0.9.0;
 
 
-import "./dependencies/Arbitrable.sol";
+import "./dep/Arbitrable.sol";
 
 /**
  * @title Gambleboard
@@ -16,6 +16,13 @@ import "./dependencies/Arbitrable.sol";
  * disagreement:      3
  * disputed:          4
  * arbitration:       5
+ * 
+ * @dev countryLeagueCategory:
+ * Country, Category and League are concatenated to one bytes2 variable. 
+ * Bits from left to right
+ * Country: 8 bits
+ * League: 8 bits
+ * Category: 16 bits
  */
 contract GambleBoard is Arbitrable {
     
@@ -37,7 +44,7 @@ contract GambleBoard is Arbitrable {
     uint constant ONE_DAY = 86400;
 
     // Indexed params can be filtered in the UI.
-    event BetCreated(bytes indexed betID, uint8 indexed country, uint16 indexed category,  bytes betIDData, uint8 league, uint backerStake);
+    event BetCreated(uint indexed betID, address indexed creator, uint backerStake);
 
     // Arbitration fee is just added to the steak of the player.
     struct Bet {
@@ -45,8 +52,9 @@ contract GambleBoard is Arbitrable {
         uint256 deadline; // The same variable used for both deadlines, voting and dispute fee deposit
         uint256 backerStake;
         uint256 totalStake;
-        uint8 state;
         RulingOptions outcome;
+        uint8 state;
+        bytes4 countryLeagueCategory;
         address payable creator;
         address payable backer;
         address payable lastArbitrationFeeAddr;
@@ -54,11 +62,14 @@ contract GambleBoard is Arbitrable {
         string creatorBetDescription;
     }
     
-    mapping(bytes => Bet) public bets;
-    mapping(address => uint32) public betsCreated;
-    mapping(uint => bytes) private disputeIDToBetID;
+    mapping(uint => Bet) public bets;
+    mapping(uint => uint) private disputeIDToBetID;
     
-    constructor(Arbitrator _arbitrator, bytes memory _arbitratorExtraData) Arbitrable(_arbitrator, _arbitratorExtraData) {}
+    uint public betsCreated;
+    
+    constructor(Arbitrator _arbitrator, bytes memory _arbitratorExtraData) Arbitrable(_arbitrator, _arbitratorExtraData) {
+        betsCreated = 0;
+    }
     
     /**
      * Creates a new bet. Calculates the amount a backer has to stake from the creators stake and odd.
@@ -67,18 +78,14 @@ contract GambleBoard is Arbitrable {
      * @ params:
      * description: String description of the match
      * creatorBetDescription: String description of the creators bet.
-     * country: country code as integer
-     * category: category as integer
-     * league: league as integer
+     * countryLeagueCategory: Country, Category and League of the bet concatenated into a bytes2
      * stakingDeadline: deadline after which no new bets are accepted. Unix time
-     * deadline: amount of time to vote after the stakingDeadline. Seconds
+     * timeToVote: amount of time to vote after the stakingDeadline. Seconds
      * creatorOdd: The odd of the outcome the creator chose. x.yz e 18
      */
     function createBet(string memory description,
                        string memory creatorBetDescription,
-                       uint8 country,
-                       uint16 category,
-                       uint8 league,
+                       bytes4 countryLeagueCategory,
                        uint stakingDeadline,
                        uint timeToVote,
                        uint creatorOdd
@@ -86,12 +93,9 @@ contract GambleBoard is Arbitrable {
                            
         require(msg.value > MIN_STAKE, "Creator bet has to be bigger than 1000000 wei");
         require(creatorOdd > MIN_ODD, "Creator odd has to be bigger than 1!");
-        require(country < MAX_COUNTRIES, "Invalid country number!");
         require(stakingDeadline > block.timestamp, "Deadline to place stakes cannot be in the past!");
         require(timeToVote > ONE_DAY, "Time to vote should be atleast 1 day!");
-        bytes memory betID = abi.encodePacked(uint160(msg.sender), betsCreated[msg.sender]);
-        betsCreated[msg.sender] += 1;
-        require(bets[betID].creator == address(0x0), "Bet ID collision!");
+        uint betID = betsCreated++;
 
         Bet storage newBet = bets[betID];
 
@@ -107,14 +111,15 @@ contract GambleBoard is Arbitrable {
         newBet.creatorBetDescription = creatorBetDescription;
         newBet.stakingDeadline = stakingDeadline;
         newBet.deadline = timeToVote;
+        newBet.countryLeagueCategory = countryLeagueCategory;
 
-        emit BetCreated(betID, country, category, betID, league, newBet.backerStake);
+        emit BetCreated(betID, msg.sender, newBet.backerStake);
         
         return true;
     }
     
     
-    function placeBet(bytes memory betID) payable public returns (bool) {
+    function placeBet(uint betID) payable public returns (bool) {
         Bet storage placingBet = bets[betID];
         
         //check that the state is open
@@ -147,33 +152,33 @@ contract GambleBoard is Arbitrable {
         return true;
     }
     
-    function voteOnOutcome(bytes memory betID, uint outcome) public {
+    function voteOnOutcome(uint betID, uint outcome) public {
         
     }
     
-    function resolveBet(bytes memory betID, uint outcome) private {
+    function resolveBet(uint betID, uint outcome) private {
         
     }
     
-    function claimWinnings(bytes memory betID) public {
+    function claimWinnings(uint betID) public {
         // If bet is in disputed state and time to deposit arbitration fee has expired,
         // the first who deposited the fee can claim the winnings.
     }
     
     // @title Creates a dispute in the arbitrator contract
-    // Only one player is needed to create the dispute. Arbitration fee goes to the winner.
-    function depositArbitrationFee(bytes memory betID) public payable {
+    // Both players need to deposit arbitration fee. Arbitration fees go to the winner.
+    // If the second player does not deposit arbitration fee in time, the first to deposit the fee wins.
+    function depositArbitrationFee(uint betID) public payable {
         Bet storage bet = bets[betID];
-        require(bet.creator != address(0x00), "Bet Does not exist!");
         require(bet.state == STATE_DISAGREEMENT || bet.state == STATE_DISPUTED, "Bet not in disputed or disagreement state!");
         require(msg.sender == bet.creator || msg.sender == bet.backer, "Only the players can send the bet to arbitration!");
+        require(msg.value >= arbitrator.arbitrationCost("0x0"), "Not enough ETH to cover arbitration costs.");
         
         if (bet.state == STATE_DISPUTED) {
             bet.totalStake += msg.value;
             arbitrator.createDispute{value: msg.value}(RULING_OPTIONS_AMOUNT, "");
             bet.state = STATE_ARBITRATION;   
         } else {
-            require(msg.value >= arbitrator.arbitrationCost("0x0"), "Not enough ETH to cover arbitration costs.");
             bet.totalStake += msg.value;
             bet.deadline = block.timestamp + ONE_DAY;
             bet.lastArbitrationFeeAddr = payable(msg.sender);
