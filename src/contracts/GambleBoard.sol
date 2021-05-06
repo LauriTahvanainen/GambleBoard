@@ -15,7 +15,6 @@ import "./dep/Arbitrable.sol";
  * resolved:          2
  * disagreement:      3
  * disputed:          4
- * arbitration:       5
  * 
  * @dev countryLeagueCategory:
  * Country, Category and League are concatenated to one bytes2 variable. 
@@ -31,7 +30,6 @@ contract GambleBoard is Arbitrable {
     uint8 constant STATE_RESOLVED = 2;
     uint8 constant STATE_DISAGREEMENT = 3;
     uint8 constant STATE_DISPUTED = 4;
-    uint8 constant STATE_ARBITRATION = 5;
 
     enum RulingOptions {RefusedToArbitrate, creatorWins, backerWins}
     uint constant RULING_OPTIONS_AMOUNT = 2; // 0 if can't arbitrate
@@ -46,12 +44,11 @@ contract GambleBoard is Arbitrable {
     // Indexed params can be filtered in the UI.
     event BetCreated(uint indexed betID, address indexed creator, uint backerStake);
 
-    // Arbitration fee is just added to the steak of the player.
     struct Bet {
         uint256 stakingDeadline;
-        uint256 deadline; // The same variable used for both deadlines, voting and dispute fee deposit
+        uint256 votingDeadline;
         uint256 backerStake;
-        uint256 totalStake;
+        uint256 totalStake;     // Arbitration fee is added to the total stake.
         RulingOptions outcome;
         uint8 state;
         bytes4 countryLeagueCategory;
@@ -109,7 +106,7 @@ contract GambleBoard is Arbitrable {
         newBet.description = description;
         newBet.creatorBetDescription = creatorBetDescription;
         newBet.stakingDeadline = stakingDeadline;
-        newBet.deadline = timeToVote;
+        newBet.votingDeadline = stakingDeadline + timeToVote;
         newBet.countryLeagueCategory = countryLeagueCategory;
 
         emit BetCreated(betID, msg.sender, newBet.backerStake);
@@ -160,29 +157,22 @@ contract GambleBoard is Arbitrable {
     }
     
     function claimWinnings(uint betID) public {
-        // If bet is in disputed state and time to deposit arbitration fee has expired,
-        // the first who deposited the fee can claim the winnings.
+        // If only one player voted within the time to vote, the one who voted can claim the winnings.
+        // If no players voted in time, the stakes are refunded.
     }
     
     // @title Creates a dispute in the arbitrator contract
-    // Both players need to deposit arbitration fee. Arbitration fees go to the winner.
-    // If the second player does not deposit arbitration fee in time, the first to deposit the fee wins.
-    // One player can pay the arbitration fee of both players.
-    function depositArbitrationFee(uint betID) public payable {
+    // Needs to deposit arbitration fee. The fee goes to the winner.
+    // One player is enough to send the case to arbitration.
+    function createDispute(uint betID) public payable {
         Bet storage bet = bets[betID];
-        require(bet.state == STATE_DISAGREEMENT || bet.state == STATE_DISPUTED, "Bet not in disputed or disagreement state!");
-        require(msg.sender == bet.creator || msg.sender == bet.backer, "Only a players can send the bet to arbitration!");
+        require(bet.state == STATE_DISAGREEMENT, "Bet not in disagreement state!");
+        require(msg.sender == bet.creator || msg.sender == bet.backer, "Only a player can send the bet to arbitration!");
         require(msg.value >= arbitrator.arbitrationCost("0x0"), "Not enough ETH to cover arbitration costs.");
-
-        if (bet.state == STATE_DISPUTED) {
-            bet.totalStake += msg.value;
-            arbitrator.createDispute{value: msg.value}(RULING_OPTIONS_AMOUNT, "");
-            bet.state = STATE_ARBITRATION;   
-        } else {
-            bet.totalStake += msg.value;
-            bet.deadline = block.timestamp + ONE_DAY;
-            bet.state = STATE_DISPUTED;
-        }
+        
+        bet.totalStake += msg.value;
+        bet.state = STATE_DISPUTED;   
+        arbitrator.createDispute{value: msg.value}(RULING_OPTIONS_AMOUNT, "");
     }
     
     function executeRuling(uint _disputeID, uint _ruling) override internal {
