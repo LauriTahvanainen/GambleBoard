@@ -30,6 +30,7 @@ contract GambleBoard is Arbitrable {
     uint8 constant private STATE_RESOLVED = 2;
     uint8 constant private STATE_DISAGREEMENT = 3;
     uint8 constant private STATE_DISPUTED = 4;
+    uint8 constant private STATE_NOOUTCOME = 5;
     
     uint constant private ONE_DAY = 86400;
      
@@ -54,8 +55,8 @@ contract GambleBoard is Arbitrable {
     struct Bet {
         uint256 stakingDeadline;
         uint256 votingDeadline;
-        uint256 backerStake;
-        uint256 totalStake;     // Arbitration fee is added to the total stake.
+        uint256 backerStake;      // Arbitration fee is added to the fee payers stake.
+        uint256 creatorStake;             
         RulingOptions outcome;
         uint8 state;
         bytes4 countryLeagueCategory;
@@ -92,7 +93,7 @@ contract GambleBoard is Arbitrable {
                        uint stakingDeadline,
                        uint timeToVote,
                        uint creatorOdd
-                       ) payable public returns (bool){
+                       ) payable public returns (uint){
                            
         require(msg.value > MIN_STAKE, "Creator bet has to be bigger than 1000000 wei");
         require(creatorOdd > MIN_ODD, "Creator odd has to be bigger than 1!");
@@ -107,7 +108,7 @@ contract GambleBoard is Arbitrable {
         
         uint amountToWinFromBet = (msg.value * creatorOdd) / MIN_ODD;
         newBet.backerStake = amountToWinFromBet - msg.value;
-        newBet.totalStake = msg.value;
+        newBet.creatorStake = msg.value;
 
         newBet.creator = payable(msg.sender);
         newBet.description = description;
@@ -118,7 +119,7 @@ contract GambleBoard is Arbitrable {
 
         emit BetCreated(betID, msg.sender, newBet.backerStake);
         
-        return true;
+        return betID;
     }
     
     
@@ -171,14 +172,48 @@ contract GambleBoard is Arbitrable {
     }
 
 
+    function refund(uint betID) public onlyPlayer(betID) {
+        // If no players voted in time or if the votes were on NoOutcome, the stakes are refunded.
+        require(bets[betID].outcome == RulingOptions.NoOutcome, "Bet outcome defined");
+        require((bets[betID].state == STATE_VOTING && bets[betID].votingDeadline < block.timestamp) || bets[betID].state == STATE_RESOLVED, "Refund not possible");
+        
+        if ((msg.sender) == bets[betID].creator){
+            uint amountTransfer = bets[betID].creatorStake;
+            bets[betID].creatorStake = 0;
+            payable(msg.sender).transfer(amountTransfer);
+        } else {
+            uint amountTransfer = bets[betID].backerStake;
+            bets[betID].backerStake = 0;
+            payable(msg.sender).transfer(amountTransfer);
+        }
+    }
+
+
 
        
     function claimWinnings(uint betID) public onlyPlayer(betID) {
+        // If only one player voted within the time to vote, the winner of the bet will be choosen based on the one voting.
+        // Player who won the bet can claim winning, but can also be called by loser
+        // Function can only be called after voting Deadline
         
+        require(bets[betID].state == STATE_RESOLVED || (bets[betID].state == STATE_VOTING && bets[betID].votingDeadline < block.timestamp));
+        require(bets[betID].outcome != RulingOptions.NoOutcome);
         
-        // If only one player voted within the time to vote, the one who voted can claim the winnings.
-        // If no players voted in time, the stakes are refunded.
+        uint amountTransfer = bets[betID].creatorStake + bets[betID].backerStake;
+        bets[betID].creatorStake = 0;
+        bets[betID].backerStake = 0;
+        
+        if (bets[betID].outcome == RulingOptions.creatorWins){
+            bets[betID].creator.transfer(amountTransfer);
+            
+        } else {
+            bets[betID].backer.transfer(amountTransfer);
+        }
     }
+        
+  
+    
+    
     
     // @title Creates a dispute in the arbitrator contract
     // Needs to deposit arbitration fee. The fee goes to the winner.
@@ -187,7 +222,11 @@ contract GambleBoard is Arbitrable {
         require(bets[betID].state == STATE_DISAGREEMENT, "Bet not in disagreement state!");
         require(msg.value >= arbitrator.arbitrationCost("0x0"), "Not enough ETH to cover arbitration costs.");
         
-        bets[betID].totalStake += msg.value;
+        if ((msg.sender) == bets[betID].creator){
+            bets[betID].creatorStake += msg.value;
+        } else {
+            bets[betID].backerStake += msg.value;
+        }
         bets[betID].state = STATE_DISPUTED;   
         disputeIDToBetID[arbitrator.createDispute{value: msg.value}(RULING_OPTIONS_AMOUNT, "")] = betID;
     }
