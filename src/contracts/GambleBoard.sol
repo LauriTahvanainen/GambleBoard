@@ -30,7 +30,6 @@ contract GambleBoard is Arbitrable {
     uint8 constant private STATE_RESOLVED = 2;
     uint8 constant private STATE_DISAGREEMENT = 3;
     uint8 constant private STATE_DISPUTED = 4;
-    uint8 constant private STATE_NOOUTCOME = 5;
     
     uint constant private ONE_DAY = 86400;
      
