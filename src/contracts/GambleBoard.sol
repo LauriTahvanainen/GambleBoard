@@ -25,25 +25,32 @@ import "./dep/Arbitrable.sol";
  */
 contract GambleBoard is Arbitrable {
     
-    uint8 constant STATE_OPEN = 0;
-    uint8 constant STATE_VOTING = 1;
-    uint8 constant STATE_RESOLVED = 2;
-    uint8 constant STATE_DISAGREEMENT = 3;
-    uint8 constant STATE_DISPUTED = 4;
-
-    enum RulingOptions {RefusedToArbitrate, creatorWins, backerWins}
-    uint constant RULING_OPTIONS_AMOUNT = 2; // 0 if can't arbitrate
+    uint8 constant private STATE_OPEN = 0;
+    uint8 constant private STATE_VOTING = 1;
+    uint8 constant private STATE_RESOLVED = 2;
+    uint8 constant private STATE_DISAGREEMENT = 3;
+    uint8 constant private STATE_DISPUTED = 4;
     
-    uint8 constant MAX_COUNTRIES = 200;
+    uint constant private ONE_DAY = 86400;
+     
+    uint8 constant private MAX_COUNTRIES = 200;
+
+    enum RulingOptions {NoOutcome, creatorWins, backerWins}
+    
+    uint constant public RULING_OPTIONS_AMOUNT = 2; // 0 if can't arbitrate
+    
     // Odds with 6 decimals.
-    uint constant MIN_ODD = 1000000;
-    uint constant MIN_STAKE = 1000000;
+    uint constant public MIN_ODD = 1000000;
+    uint constant public MIN_STAKE = 1000000;
     
-    uint constant ONE_DAY = 86400;
-
     // Indexed params can be filtered in the UI.
     event BetCreated(uint indexed betID, address indexed creator, uint backerStake);
 
+    modifier onlyPlayer(uint betID){
+        require(msg.sender == bets[betID].creator || msg.sender == bets[betID].backer, "Only a player can send the bet to arbitration!");
+        _;    
+    }
+    
     struct Bet {
         uint256 stakingDeadline;
         uint256 votingDeadline;
@@ -147,16 +154,28 @@ contract GambleBoard is Arbitrable {
         
         return true;
     }
+  
     
-    function voteOnOutcome(uint betID, uint outcome) public {
+    function voteOnOutcome(uint betID, RulingOptions outcome) public onlyPlayer(betID) {
+        require(bets[betID].state == STATE_VOTING, "State is not on voting");
         
+        if (bets[betID].outcome == RulingOptions.NoOutcome){
+            bets[betID].outcome = outcome;
+        } else {
+            if (bets[betID].outcome == outcome){
+                bets[betID].state = STATE_RESOLVED;
+            } else {
+                bets[betID].state = STATE_DISPUTED;
+            }
+        }
     }
-    
-    function resolveBet(uint betID, uint outcome) private {
+
+
+
+       
+    function claimWinnings(uint betID) public onlyPlayer(betID) {
         
-    }
-    
-    function claimWinnings(uint betID) public {
+        
         // If only one player voted within the time to vote, the one who voted can claim the winnings.
         // If no players voted in time, the stakes are refunded.
     }
@@ -164,19 +183,18 @@ contract GambleBoard is Arbitrable {
     // @title Creates a dispute in the arbitrator contract
     // Needs to deposit arbitration fee. The fee goes to the winner.
     // One player is enough to send the case to arbitration.
-    function createDispute(uint betID) public payable {
-        Bet storage bet = bets[betID];
-        require(bet.state == STATE_DISAGREEMENT, "Bet not in disagreement state!");
-        require(msg.sender == bet.creator || msg.sender == bet.backer, "Only a player can send the bet to arbitration!");
+    function createDispute(uint betID) public payable onlyPlayer(betID) {
+        require(bets[betID].state == STATE_DISAGREEMENT, "Bet not in disagreement state!");
         require(msg.value >= arbitrator.arbitrationCost("0x0"), "Not enough ETH to cover arbitration costs.");
         
-        bet.totalStake += msg.value;
-        bet.state = STATE_DISPUTED;   
-        arbitrator.createDispute{value: msg.value}(RULING_OPTIONS_AMOUNT, "");
+        bets[betID].totalStake += msg.value;
+        bets[betID].state = STATE_DISPUTED;   
+        disputeIDToBetID[arbitrator.createDispute{value: msg.value}(RULING_OPTIONS_AMOUNT, "")] = betID;
     }
     
     function executeRuling(uint _disputeID, uint _ruling) override internal {
-        resolveBet(disputeIDToBetID[_disputeID], _ruling);
+        bets[disputeIDToBetID[_disputeID]].state = STATE_RESOLVED;
+        bets[disputeIDToBetID[_disputeID]].outcome = RulingOptions(_ruling);    
     }
     
     //Fallback functions if someone only sends ether to the contract address

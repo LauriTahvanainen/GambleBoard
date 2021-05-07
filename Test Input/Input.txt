@@ -1,0 +1,2 @@
+Create Bet:
+"Zurich vs Basel","Zurich wins","0x01010001","1629962138","90000","2000000"
