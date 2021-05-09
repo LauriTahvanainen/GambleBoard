@@ -1,0 +1,20 @@
+type Bet @entity {
+  id: ID!
+  timeCreated: BigInt!
+  timeUpdated: BigInt!
+  creator: Bytes!
+  creatorStake: BigInt!
+  backer: Bytes!
+  backerStake: BigInt!
+  outcome: Int!
+  state: Int!
+  stakingDeadline: BigInt!
+  votingDeadline: BigInt!
+  description: String!
+  creatorBetDescription: String!
+  country: Int!
+  league: Int! 
+  category: Int!
+  disputeID: BigInt
+}
+

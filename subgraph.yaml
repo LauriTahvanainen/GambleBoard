@@ -1,0 +1,51 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: GambleBoard
+    network: ganache-cli #mainnet
+    source:
+      address: "CONTRACT ADDRESS HERE"
+      abi: GambleBoard
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Bet
+        - BetCreated
+        - BetDisputed
+        - BetPlaced
+        - BetRefund
+        - BetStateChanged
+        - BetVotedOn
+        - Dispute
+        - Evidence
+        - MetaEvidence
+        - Ruling
+      abis:
+        - name: GambleBoard
+          file: ./abis/GambleBoard.json
+      eventHandlers:
+        - event: BetCreated(uint256,uint8,uint8,uint16)
+          handler: handleBetCreated
+        - event: BetDisputed(uint256,uint256,uint8)
+          handler: handleBetDisputed
+        - event: BetPlaced(uint256,address,uint8)
+          handler: handleBetPlaced
+        - event: BetRefund(uint256,uint8,uint256,uint256)
+          handler: handleBetRefund
+        - event: BetStateChanged(uint256,uint8)
+          handler: handleBetStateChanged
+        - event: BetVotedOn(uint256,uint8,uint8)
+          handler: handleBetVotedOn
+        - event: Dispute(indexed address,indexed uint256,uint256,uint256)
+          handler: handleDispute
+        - event: Evidence(indexed address,indexed uint256,indexed address,string)
+          handler: handleEvidence
+        - event: MetaEvidence(indexed uint256,string)
+          handler: handleMetaEvidence
+        - event: Ruling(indexed address,indexed uint256,uint256)
+          handler: handleRuling
+      file: ./src/mappings/mapping.ts

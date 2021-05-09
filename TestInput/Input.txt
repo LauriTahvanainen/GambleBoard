@@ -1,0 +1,10 @@
+Graph node start: cargo run -p graph-node --release -- --postgres-url postgresql://postgres:postgres@localhost:5432/graph-node --ethereum-rpc ganache-cli:http://127.0.0.1:8545 --ipfs 127.0.0.1:5001 --debug
+
+
+Memonic for Ganache and Metamask: 
+
+census armed fade noise staff random jump network puppy output exclude effort
+
+
+CreateBet:
+"Zurich vs Basel","Zurich wins","1","1","1","1629962138","90000","2000000"
