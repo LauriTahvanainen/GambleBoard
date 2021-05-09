@@ -45,7 +45,8 @@ contract GambleBoard is Arbitrable {
     
     // Indexed params can be filtered in the UI.
     event BetCreated(uint indexed betID, address indexed creator, uint backerStake);
-
+    event BetPlaced(uint indexed betID, address backer, uint backerStake);
+    
     modifier onlyPlayer(uint betID){
         require(msg.sender == bets[betID].creator || msg.sender == bets[betID].backer, "Only a player can send the bet to arbitration!");
         _;    
@@ -151,6 +152,8 @@ contract GambleBoard is Arbitrable {
 
         placingBet.backer = payable(msg.sender);       
         placingBet.state = STATE_VOTING;
+        
+        emit BetPlaced(betID, msg.sender, msg.value);
         
         return true;
     }
