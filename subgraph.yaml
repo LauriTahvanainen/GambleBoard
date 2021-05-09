@@ -4,9 +4,9 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: GambleBoard
-    network: ganache-cli #mainnet
+    network: ganache-cli #mainnet / ganache
     source:
-      address: "CONTRACT ADDRESS HERE"
+      address: "CONTRACT_ADDRESS_HERE"
       abi: GambleBoard
     mapping:
       kind: ethereum/events

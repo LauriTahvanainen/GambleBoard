@@ -23,7 +23,6 @@ import "./dep/Arbitrable.sol";
  * Category: 16 bits
  */
 contract GambleBoard is Arbitrable {
-
     enum State {OPEN, VOTING, AGREEMENT, DISAGREEMENT, DISPUTED, CLOSED}
     enum RulingOption {NO_OUTCOME, CREATOR_WINS, BACKER_WINS}
 
@@ -48,7 +47,12 @@ contract GambleBoard is Arbitrable {
     event BetStateChanged(uint256 betID, State state);
     event BetVotedOn(uint256 betID, RulingOption outcome, State state);
     event BetDisputed(uint256 betID, uint256 disputeID, State state);
-    event BetRefund(uint256 betID, State state, uint256 backerStake, uint256 creatorStake);
+    event BetRefund(
+        uint256 betID,
+        State state,
+        uint256 backerStake,
+        uint256 creatorStake
+    );
 
     modifier onlyPlayer(uint256 betID) {
         require(
@@ -210,7 +214,12 @@ contract GambleBoard is Arbitrable {
             bets[betID].state = State.CLOSED;
         }
 
-        emit BetRefund(betID, bets[betID].state, bets[betID].backerStake, bets[betID].creatorStake);
+        emit BetRefund(
+            betID,
+            bets[betID].state,
+            bets[betID].backerStake,
+            bets[betID].creatorStake
+        );
     }
 
     function claimWinnings(uint256 betID) public onlyPlayer(betID) {
@@ -218,11 +227,8 @@ contract GambleBoard is Arbitrable {
         // Player who won the bet can claim winning, but can also be called by loser
         // Function can only be called after voting Deadline
 
-        require(
-            bets[betID].state == State.AGREEMENT ||
-                (bets[betID].state == State.VOTING &&
-                    bets[betID].votingDeadline < block.timestamp)
-        );
+        require(bets[betID].state == State.AGREEMENT || 
+               (bets[betID].state == State.VOTING && bets[betID].votingDeadline < block.timestamp));
         require(bets[betID].outcome != RulingOption.NO_OUTCOME);
 
         uint256 amountTransfer = bets[betID].creatorStake + bets[betID].backerStake;
