@@ -2,6 +2,8 @@
 
 A decentralized betting platform!
 
+[Requirements](https://github.com/LauriTahvanainen/GambleBoard/edit/main/documentation/requirements.md)
+
 ## Running
 
 Deploying the project locally:
