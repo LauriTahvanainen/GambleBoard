@@ -10,19 +10,19 @@ Deploying the project locally:
 
 Install:
 
-- [Ganache!](https://github.com/trufflesuite/ganache-cli)/[Ganache-Cli!](https://github.com/trufflesuite/ganache-cli)
-- [npm!](https://www.npmjs.com/get-npm)
-- [yarn!](https://yarnpkg.com/getting-started/install) (e.g. with npm)
-- [Graph CLI!](https://github.com/graphprotocol/graph-cli)
-- [Graph TypeScript Library!](https://github.com/graphprotocol/graph-ts)
-- [Graph Node!](https://github.com/graphprotocol/graph-node)
-	- [Rust!](https://www.rust-lang.org/en-US/install.html) (latest stable)
-	- [PostgreSQL!](https://www.postgresql.org/download/)
-	- [IPFS!](https://docs.ipfs.io/install/)
+- [Ganache](https://github.com/trufflesuite/ganache-cli)/[Ganache-Cli](https://github.com/trufflesuite/ganache-cli)
+- [npm](https://www.npmjs.com/get-npm)
+- [yarn](https://yarnpkg.com/getting-started/install) (e.g. with npm)
+- [Graph CLI](https://github.com/graphprotocol/graph-cli)
+- [Graph TypeScript Library](https://github.com/graphprotocol/graph-ts)
+- [Graph Node](https://github.com/graphprotocol/graph-node)
+	- [Rust](https://www.rust-lang.org/en-US/install.html) (latest stable)
+	- [PostgreSQL](https://www.postgresql.org/download/)
+	- [IPFS](https://docs.ipfs.io/install/)
 
 #### Contract
 
-Use for example the [Remix IDE!](https://remix.ethereum.org) to edit and deploy the contracts to the Ganache blockchain. Then copy the address of the contract to the `subgraph.yaml file`.
+Use for example the [Remix IDE](https://remix.ethereum.org) to edit and deploy the contracts to the Ganache blockchain. Then copy the address of the contract to the `subgraph.yaml file`.
 
 #### Local Graph Node Deployment Steps
 
@@ -52,8 +52,7 @@ cargo run -p graph-node --release \
 ```
 
 Try your OS username as `USERNAME` and `PASSWORD`. For details on setting
-the connection string, check the [Postgres
-documentation](https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-CONNSTRING).
+the connection string, check the [Postgres documentation](https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-CONNSTRING).
 `graph-node` uses a few Postgres extensions. If the Postgres user with which
 you run `graph-node` is a superuser, `graph-node` will enable these
 extensions when it initalizes the database. If the Postgres user is not a
@@ -84,7 +83,7 @@ yarn deploy-local
 
 If the deploy succeeds it will print the links to the endpoints of the subgraph. Accessing the Queries link, you can query the subgraph from the browser. For example: `http://localhost:8000/subgraphs/name/LauriTahvanainen/GambleBoard`
 
-Now everything should be running locally. [More information on the graph-node!](https://github.com/graphprotocol/graph-node/blob/master/docs/getting-started.md)
+Now everything should be running locally. [More information on the graph-node](https://github.com/graphprotocol/graph-node/blob/master/docs/getting-started.md)
 
 ### Changes to the contract/subgraph mappings.
 
@@ -104,9 +103,9 @@ yarn deploy-local
 
 ## Resources
 
-- [Solidity!](https://buildmedia.readthedocs.org/media/pdf/solidity/develop/solidity.pdf)
-- [The Graph!](https://thegraph.com/docs/introduction)
-- [GraphQL!](https://graphql.org/learn/) and [Queries With The Graph!](https://thegraph.com/docs/graphql-api#queries) 
+- [Solidity](https://buildmedia.readthedocs.org/media/pdf/solidity/develop/solidity.pdf)
+- [The Graph](https://thegraph.com/docs/introduction)
+- [GraphQL](https://graphql.org/learn/) and [Queries With The Graph](https://thegraph.com/docs/graphql-api#queries) 
 
 
 
