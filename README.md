@@ -97,8 +97,6 @@ Steps to do when updating the `contract/mapping.ts/schema.graphql` (not all migh
 4. Run:
 
 ```
-yarn create-local
-
 yarn deploy-local
 ```
 5. Fix possible errors; Repeat step 4 until the subgraph is deployed.
