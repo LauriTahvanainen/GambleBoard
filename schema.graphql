@@ -8,13 +8,22 @@ type Bet @entity {
   backerStake: BigInt!
   outcome: Int!
   state: Int!
+  voteEvidenceBools: Bytes!
   stakingDeadline: BigInt!
   votingDeadline: BigInt!
   description: String!
   creatorBetDescription: String!
   country: Int!
-  league: Int! 
+  league: String! 
   category: Int!
   disputeID: BigInt
+}
+
+type Event @entity {
+  id: ID!
+  league: String! 
+  country: Int!
+  category: Int!
+  betIDs: [BigInt!]
 }
 

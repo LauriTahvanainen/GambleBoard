@@ -9,20 +9,22 @@ import "./dep/Arbitrable.sol";
  * Create and place decentralized "Back and lay" bets on anything.
  * @dev Parimutuel betting might be useful to be put into another contract.
  * @dev states:
- * open:              0
- * waiting for votes: 1
- * resolved:          2
- * disagreement:      3
- * disputed:          4
+ * Open:              0
+ * Voting:            1
+ * Agreement:         2
+ * Disagreement:      3
+ * Disputed:          4
+ * Closed:            5
  *
- * @dev countryLeagueCategory:
- * Country, Category and League are concatenated to one bytes2 variable.
- * Bits from left to right
- * Country: 8 bits
- * League: 8 bits
- * Category: 16 bits
+ * @dev voteEvidence bool array holds information on if
+ * creator and backer voted and if creator and backer provided evidence
  */
 contract GambleBoard is Arbitrable {
+    bytes1 private constant CREATOR_VOTED = 0x01;
+    bytes1 private constant BACKER_VOTED = 0x02;
+    bytes1 private constant CREATOR_PROVIDED_EVIDENCE = 0x04;
+    bytes1 private constant BACKER_PROVIDED_EVIDENCE = 0x08;
+
     enum State {OPEN, VOTING, AGREEMENT, DISAGREEMENT, DISPUTED, CLOSED}
     enum RulingOption {NO_OUTCOME, CREATOR_WINS, BACKER_WINS}
 
@@ -40,13 +42,12 @@ contract GambleBoard is Arbitrable {
     event BetCreated(
         uint256 betID,
         uint8 country,
-        uint8 league,
+        string league,
         uint16 category
     );
     event BetPlaced(uint256 betID, address backer, State state);
     event BetStateChanged(uint256 betID, State state);
-    event BetVotedOn(uint256 betID, RulingOption outcome, State state);
-    event BetDisputed(uint256 betID, uint256 disputeID, State state);
+    event BetVotedOn(uint256 betID);
     event BetRefund(
         uint256 betID,
         State state,
@@ -58,7 +59,7 @@ contract GambleBoard is Arbitrable {
         require(
             msg.sender == bets[betID].creator ||
                 msg.sender == bets[betID].backer,
-            "Only a player can send the bet to arbitration!"
+            "Only a player can interract with a bet!"
         );
         _;
     }
@@ -70,6 +71,7 @@ contract GambleBoard is Arbitrable {
         uint256 creatorStake;
         RulingOption outcome;
         State state;
+        bytes1 voteEvidenceBools;
         address payable creator;
         address payable backer;
         string description;
@@ -77,7 +79,7 @@ contract GambleBoard is Arbitrable {
     }
 
     mapping(uint256 => Bet) public bets;
-    mapping(uint256 => uint256) private disputeIDToBetID;
+    mapping(uint256 => uint256) public disputeIDToBetID;
 
     uint256 public betsCreated;
 
@@ -102,8 +104,8 @@ contract GambleBoard is Arbitrable {
     function createBet(
         string memory description,
         string memory creatorBetDescription,
+        string memory league,
         uint8 country,
-        uint8 league,
         uint16 category,
         uint256 stakingDeadline,
         uint256 timeToVote,
@@ -147,6 +149,11 @@ contract GambleBoard is Arbitrable {
         //check that the state is open
         require(placingBet.state == State.OPEN, "The bet is not open!");
 
+        require(
+            msg.sender != placingBet.creator,
+            "Creator cannot bet on own bet!"
+        );
+
         //make sure that the bet is not done after the Deadline
         require(
             block.timestamp <= placingBet.stakingDeadline,
@@ -172,88 +179,101 @@ contract GambleBoard is Arbitrable {
         public
         onlyPlayer(betID)
     {
-        require(bets[betID].state == State.VOTING, "State is not on voting");
+        Bet storage bet = bets[betID];
+        require(bet.state == State.VOTING, "State is not on voting");
 
-        if (bets[betID].outcome == RulingOption.NO_OUTCOME) {
-            bets[betID].outcome = outcome;
+        if (msg.sender == bet.creator) {
+            require(
+                (bet.voteEvidenceBools & CREATOR_VOTED) != CREATOR_VOTED,
+                "Player can only vote once!"
+            );
+            bet.voteEvidenceBools = bet.voteEvidenceBools | CREATOR_VOTED;
         } else {
-            if (bets[betID].outcome == outcome) {
-                bets[betID].state = State.AGREEMENT;
+            require(
+                (bet.voteEvidenceBools & BACKER_VOTED) != BACKER_VOTED,
+                "Player can only vote once!"
+            );
+            bet.voteEvidenceBools = bet.voteEvidenceBools | BACKER_VOTED;
+        }
+
+        if (bet.outcome == RulingOption.NO_OUTCOME) {
+            bet.outcome = outcome;
+        } else {
+            if (bet.outcome == outcome) {
+                bet.state = State.AGREEMENT;
             } else {
-                bets[betID].state = State.DISPUTED;
+                bet.state = State.DISPUTED;
             }
         }
 
-        emit BetVotedOn(betID, bets[betID].outcome, bets[betID].state);
+        emit BetVotedOn(betID);
     }
 
     function refund(uint256 betID) public onlyPlayer(betID) {
         // If no players voted in time or if the votes were on NO_OUTCOME, the stakes are refunded.
+        Bet storage bet = bets[betID];
+        require(bet.outcome == RulingOption.NO_OUTCOME, "Bet outcome defined");
         require(
-            bets[betID].outcome == RulingOption.NO_OUTCOME,
-            "Bet outcome defined"
-        );
-        require(
-            (bets[betID].state == State.VOTING &&
-                bets[betID].votingDeadline < block.timestamp) ||
-                bets[betID].state == State.AGREEMENT,
+            (bet.state == State.VOTING &&
+                bet.votingDeadline < block.timestamp) ||
+                bet.state == State.AGREEMENT,
             "Refund not possible"
         );
 
-        if ((msg.sender) == bets[betID].creator) {
-            uint256 amountTransfer = bets[betID].creatorStake;
-            bets[betID].creatorStake = 0;
+        if ((msg.sender) == bet.creator) {
+            uint256 amountTransfer = bet.creatorStake;
+            bet.creatorStake = 0;
             payable(msg.sender).transfer(amountTransfer);
         } else {
-            uint256 amountTransfer = bets[betID].backerStake;
-            bets[betID].backerStake = 0;
+            uint256 amountTransfer = bet.backerStake;
+            bet.backerStake = 0;
             payable(msg.sender).transfer(amountTransfer);
         }
 
-        if (bets[betID].backerStake == 0 && bets[betID].creatorStake == 0) {
-            bets[betID].state = State.CLOSED;
+        if (bet.backerStake == 0 && bet.creatorStake == 0) {
+            bet.state = State.CLOSED;
         }
 
-        emit BetRefund(
-            betID,
-            bets[betID].state,
-            bets[betID].backerStake,
-            bets[betID].creatorStake
-        );
+        emit BetRefund(betID, bet.state, bet.backerStake, bet.creatorStake);
     }
 
+    // If only one player voted within the time to vote, the winner of the bet will be choosen based on the one voting.
+    // Player who won the bet can claim winning, but can also be called by loser
+    // Function can only be called after voting Deadline
     function claimWinnings(uint256 betID) public onlyPlayer(betID) {
-        // If only one player voted within the time to vote, the winner of the bet will be choosen based on the one voting.
-        // Player who won the bet can claim winning, but can also be called by loser
-        // Function can only be called after voting Deadline
+        Bet storage bet = bets[betID];
 
-        require(bets[betID].state == State.AGREEMENT || 
-               (bets[betID].state == State.VOTING && bets[betID].votingDeadline < block.timestamp));
-        require(bets[betID].outcome != RulingOption.NO_OUTCOME);
+        require(
+            bet.state == State.AGREEMENT ||
+                (bet.state == State.VOTING &&
+                    bet.votingDeadline < block.timestamp)
+        );
+        require(bet.outcome != RulingOption.NO_OUTCOME);
 
-        uint256 amountTransfer = bets[betID].creatorStake + bets[betID].backerStake;
-        bets[betID].state = State.CLOSED;
+        uint256 amountTransfer = bet.creatorStake + bet.backerStake;
+        bet.state = State.CLOSED;
 
-        if (bets[betID].outcome == RulingOption.CREATOR_WINS) {
-            bets[betID].creator.transfer(amountTransfer);
+        if (bet.outcome == RulingOption.CREATOR_WINS) {
+            bet.creator.transfer(amountTransfer);
         } else {
-            bets[betID].backer.transfer(amountTransfer);
+            bet.backer.transfer(amountTransfer);
         }
 
-        emit BetStateChanged(betID, bets[betID].state);
+        emit BetStateChanged(betID, bet.state);
     }
 
     // @title Creates a dispute in the arbitrator contract
     // Needs to deposit arbitration fee. The fee goes to the winner.
     // One player is enough to send the case to arbitration.
-    function createDispute(uint256 betID)
+    function createDispute(uint256 betID, string memory _metaEvidence)
         public
         payable
         onlyPlayer(betID)
         returns (uint256)
     {
+        Bet storage bet = bets[betID];
         require(
-            bets[betID].state == State.DISAGREEMENT,
+            bet.state == State.DISAGREEMENT,
             "Bet not in disagreement state!"
         );
         require(
@@ -261,12 +281,16 @@ contract GambleBoard is Arbitrable {
             "Not enough ETH to cover arbitration costs."
         );
 
-        if ((msg.sender) == bets[betID].creator) {
-            bets[betID].creatorStake += msg.value;
+        if (msg.sender == bet.creator) {
+            bet.creatorStake += msg.value;
         } else {
-            bets[betID].backerStake += msg.value;
+            bet.backerStake += msg.value;
         }
-        bets[betID].state = State.DISPUTED;
+        bet.state = State.DISPUTED;
+
+        // Has to be done before the dispute is created
+        emit MetaEvidence(betID, _metaEvidence);
+
         uint256 disputeID =
             arbitrator.createDispute{value: msg.value}(
                 RULING_OPTIONS_AMOUNT,
@@ -274,7 +298,7 @@ contract GambleBoard is Arbitrable {
             );
         disputeIDToBetID[disputeID] = betID;
 
-        emit BetDisputed(betID, disputeID, State.DISPUTED);
+        emit Dispute(arbitrator, disputeID, betID, betID);
         return disputeID;
     }
 
@@ -284,8 +308,53 @@ contract GambleBoard is Arbitrable {
     {
         bets[disputeIDToBetID[_disputeID]].state = State.AGREEMENT;
         bets[disputeIDToBetID[_disputeID]].outcome = RulingOption(_ruling);
+    }
 
-        emit BetStateChanged(disputeIDToBetID[_disputeID], State.AGREEMENT);
+    function provideEvidence(uint256 betID, string memory _evidence)
+        public
+        onlyPlayer(betID)
+    {
+        Bet storage bet = bets[betID];
+
+        require(bet.state == State.DISPUTED, "Bet is not in disputed state!");
+
+        if (msg.sender == bet.creator) {
+            require(
+                (bet.voteEvidenceBools & CREATOR_PROVIDED_EVIDENCE) !=
+                    CREATOR_PROVIDED_EVIDENCE,
+                "Player can only vote once!"
+            );
+            bet.voteEvidenceBools =
+                bet.voteEvidenceBools |
+                CREATOR_PROVIDED_EVIDENCE;
+        } else {
+            require(
+                (bet.voteEvidenceBools & BACKER_PROVIDED_EVIDENCE) !=
+                    BACKER_PROVIDED_EVIDENCE,
+                "Player can only vote once!"
+            );
+            bet.voteEvidenceBools =
+                bet.voteEvidenceBools |
+                BACKER_PROVIDED_EVIDENCE;
+        }
+
+        emit Evidence(arbitrator, betID, msg.sender, _evidence);
+    }
+
+    function betExists(uint256 betID) public view returns (bool) {
+        return bets[betID].creator == address(0x00);
+    }
+
+    function getState(uint256 betID) public view returns (uint8) {
+        return uint8(bets[betID].state);
+    }
+
+    function getOutcome(uint256 betID) public view returns (uint8) {
+        return uint8(bets[betID].outcome);
+    }
+
+    function getVoteEvidenceBools(uint256 betID) public view returns (bytes8) {
+        return bets[betID].voteEvidenceBools;
     }
 
     //Fallback functions if someone only sends ether to the contract address

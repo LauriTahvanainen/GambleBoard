@@ -1,19 +1,15 @@
-import { Address, BigInt } from "@graphprotocol/graph-ts"
-
 import {
   GambleBoard,
   BetCreated,
-  BetDisputed,
   BetPlaced,
   BetStateChanged,
   Dispute,
   Evidence,
-  MetaEvidence,
   Ruling,
   BetRefund,
   BetVotedOn
 } from "../../generated/GambleBoard/GambleBoard"
-import { Bet } from "../../generated/schema"
+import { Bet, Event } from "../../generated/schema"
 
 export function handleBetCreated(event: BetCreated): void {
   let betID = event.params.betID
@@ -29,10 +25,11 @@ export function handleBetCreated(event: BetCreated): void {
   betEntity.creatorStake = betData.value3;
   betEntity.outcome = betData.value4;
   betEntity.state = betData.value5;
-  betEntity.creator = betData.value6;
-  betEntity.backer = betData.value7;
-  betEntity.description = betData.value8;
-  betEntity.creatorBetDescription = betData.value9;
+  betEntity.voteEvidenceBools = betData.value6;
+  betEntity.creator = betData.value7;
+  betEntity.backer = betData.value8;
+  betEntity.description = betData.value9;
+  betEntity.creatorBetDescription = betData.value10;
 
   betEntity.country = event.params.country;
   betEntity.league = event.params.league;
@@ -42,27 +39,20 @@ export function handleBetCreated(event: BetCreated): void {
   betEntity.timeUpdated = event.block.timestamp;
   // Save the entity to the store
   betEntity.save()
-}
 
-export function handleBetDisputed(event: BetDisputed): void {
-  let betID = event.params.betID
+  let eventEntity = Event.load(betData.value9);
 
-  // Bind the contract and get storage data about the bet
-  let betContract = GambleBoard.bind(event.address);
-  let betData = betContract.bets(betID);
+  if (eventEntity == null) {
+    eventEntity = new Event(betData.value9);
+  }
+  
+  eventEntity.country = event.params.country;
+  eventEntity.league = event.params.league;
+  eventEntity.category = event.params.category;
 
-  // Creating a new and writing that to store is faster than loading
-  // and saving.
-  let betEntity = new Bet(betID.toHex());
-  betEntity.state = event.params.state
-  betEntity.disputeID = event.params.disputeID;
-  betEntity.backerStake = betData.value2
-  betEntity.creatorStake = betData.value3;
+  eventEntity.betIDs.push(betID);
 
-  betEntity.timeUpdated = event.block.timestamp;
-
-  // Save the entity to the store
-  betEntity.save()
+  eventEntity.save();
 }
 
 export function handleBetPlaced(event: BetPlaced): void {
@@ -85,7 +75,7 @@ export function handleBetRefund(event: BetRefund): void {
   betEntity.state = event.params.state;
   betEntity.backerStake = event.params.backerStake;
   betEntity.creatorStake = event.params.creatorStake;
-  
+
   betEntity.timeUpdated = event.block.timestamp;
 
   // Save the entity to the store
@@ -107,9 +97,13 @@ export function handleBetStateChanged(event: BetStateChanged): void {
 export function handleBetVotedOn(event: BetVotedOn): void {
   let betID = event.params.betID
 
+  // Bind the contract and get storage data about the bet
+  let betContract = GambleBoard.bind(event.address);
+  let betData = betContract.bets(betID);
   let betEntity = new Bet(betID.toHex());
-  betEntity.state = event.params.state;
-  betEntity.outcome = event.params.outcome;
+  betEntity.outcome = betContract.getOutcome(betID);
+  betEntity.state = betContract.getState(betID);
+  betEntity.voteEvidenceBools = betContract.getVoteEvidenceBools(betID);
 
   betEntity.timeUpdated = event.block.timestamp;
 
@@ -117,7 +111,7 @@ export function handleBetVotedOn(event: BetVotedOn): void {
   betEntity.save()
 }
 
-export function handleRuling(event: Ruling): void { 
+export function handleRuling(event: Ruling): void {
   let disputeID = event.params._disputeID
 
   // Bind the contract and get storage data about the bet
@@ -125,12 +119,44 @@ export function handleRuling(event: Ruling): void {
   let betID = betContract.disputeIDToBetID(disputeID);
 
   let betEntity = new Bet(betID.toHex());
-  betEntity.state = 2; // STATE_AGREEMENT
+  betEntity.state = betContract.getState(betID); // STATE_AGREEMENT
   betEntity.outcome = event.params._ruling.toI32();
 }
 
-export function handleDispute(event: Dispute): void { }
+export function handleDispute(event: Dispute): void {
+  let betID = event.params._evidenceGroupID
 
-export function handleEvidence(event: Evidence): void { }
+  // Bind the contract and get storage data about the bet
+  let betContract = GambleBoard.bind(event.address);
+  let betData = betContract.bets(betID);
 
-export function handleMetaEvidence(event: MetaEvidence): void { }
+  // Creating a new and writing that to store is faster than loading
+  // and saving.
+  let betEntity = new Bet(betID.toHex());
+  betEntity.state = betData.value5
+  betEntity.disputeID = event.params._disputeID;
+  betEntity.backerStake = betData.value2
+  betEntity.creatorStake = betData.value3;
+
+  betEntity.timeUpdated = event.block.timestamp;
+
+  // Save the entity to the store
+  betEntity.save()
+}
+
+export function handleEvidence(event: Evidence): void {
+  let betID = event.params._evidenceGroupID
+
+  // Bind the contract and get storage data about the bet
+  let betContract = GambleBoard.bind(event.address);
+  let betData = betContract.bets(betID);
+  let betEntity = new Bet(betID.toHex());
+  betEntity.outcome = betContract.getOutcome(betID);
+  betEntity.state = betContract.getState(betID);
+  betEntity.voteEvidenceBools = betContract.getVoteEvidenceBools(betID);
+
+  betEntity.timeUpdated = event.block.timestamp;
+
+  // Save the entity to the store
+  betEntity.save()
+}

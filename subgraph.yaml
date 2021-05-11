@@ -6,7 +6,7 @@ dataSources:
     name: GambleBoard
     network: ganache-cli #mainnet / ganache
     source:
-      address: "CONTRACT_ADDRESS_HERE"
+      address: "0x2E6318CC9006f132265fDBf9F68569172101Bb6f"
       abi: GambleBoard
     mapping:
       kind: ethereum/events
@@ -14,38 +14,33 @@ dataSources:
       language: wasm/assemblyscript
       entities:
         - Bet
+        - Event
         - BetCreated
-        - BetDisputed
         - BetPlaced
         - BetRefund
         - BetStateChanged
         - BetVotedOn
         - Dispute
         - Evidence
-        - MetaEvidence
         - Ruling
       abis:
         - name: GambleBoard
           file: ./abis/GambleBoard.json
       eventHandlers:
-        - event: BetCreated(uint256,uint8,uint8,uint16)
+        - event: BetCreated(uint256,uint8,string,uint16)
           handler: handleBetCreated
-        - event: BetDisputed(uint256,uint256,uint8)
-          handler: handleBetDisputed
         - event: BetPlaced(uint256,address,uint8)
           handler: handleBetPlaced
         - event: BetRefund(uint256,uint8,uint256,uint256)
           handler: handleBetRefund
         - event: BetStateChanged(uint256,uint8)
           handler: handleBetStateChanged
-        - event: BetVotedOn(uint256,uint8,uint8)
+        - event: BetVotedOn(uint256)
           handler: handleBetVotedOn
         - event: Dispute(indexed address,indexed uint256,uint256,uint256)
           handler: handleDispute
         - event: Evidence(indexed address,indexed uint256,indexed address,string)
           handler: handleEvidence
-        - event: MetaEvidence(indexed uint256,string)
-          handler: handleMetaEvidence
         - event: Ruling(indexed address,indexed uint256,uint256)
           handler: handleRuling
       file: ./src/mappings/mapping.ts
