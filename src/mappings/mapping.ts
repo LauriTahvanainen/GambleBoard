@@ -44,13 +44,20 @@ export function handleBetCreated(event: BetCreated): void {
 
   if (eventEntity == null) {
     eventEntity = new Event(betData.value9);
+    eventEntity.startTime = betData.value0;
+    eventEntity.betIDs = [];
   }
   
+  if (eventEntity.startTime > betData.value0) {
+    eventEntity.startTime = betData.value0;
+  }
   eventEntity.country = event.params.country;
   eventEntity.league = event.params.league;
   eventEntity.category = event.params.category;
 
-  eventEntity.betIDs.push(betID);
+  let betIDs = eventEntity.betIDs;
+  betIDs.push(betID);
+  eventEntity.betIDs = betIDs;
 
   eventEntity.save();
 }
