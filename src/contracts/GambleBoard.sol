@@ -206,7 +206,7 @@ contract GambleBoard is Arbitrable {
             if (bet.outcome == outcome) {
                 bet.state = State.AGREEMENT;
             } else {
-                bet.state = State.DISPUTED;
+                bet.state = State.DISAGREEMENT;
             }
         }
 
