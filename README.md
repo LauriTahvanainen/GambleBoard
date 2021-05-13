@@ -29,7 +29,7 @@ Use for example the [Remix IDE](https://remix.ethereum.org) to edit and deploy t
 #### Local Graph Node Deployment Steps
 
 1. IPFS: run `ipfs init` followed by `ipfs daemon`. This starts the IPFS service. It listens on port 5001.
-2. (NOTICE: The node documentation tells you to do it this way, but when you install PostgreSQL, it creates a default databasecluster. You could use that and run `createdb graph-node` on that) PostgreSQL: In the folder where you want to save the database run `initdb -D .postgres` followed by `pg_ctl -D .postgres -l logfile start` and `createdb graph-node`. This starts the PostgreSQL service that listens on port 5432 and initializes a PostgreSQL database named graph-node
+2. (NOTICE: The node documentation tells you to do it this way, but when you install PostgreSQL, it creates a default databasecluster. You could use that and run `createdb graph-node` on that skipping the first two commands. Commands should also be given as the user: postgres) PostgreSQL: In the folder where you want to save the database run `initdb -D .postgres` followed by `pg_ctl -D .postgres -l logfile start` and `createdb graph-node`. This starts the PostgreSQL service that listens on port 5432 and initializes a PostgreSQL database named graph-node
 3. If using Ubuntu, you may need to install additional packages:
    - `sudo apt-get install -y clang libpq-dev libssl-dev pkg-config`
 4. Install dependencies: `yarn`
