@@ -4,7 +4,7 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: GambleBoard
-    network: ganache-cli #mainnet / ganache
+    network: ganache #mainnet / ganache-cli
     source:
       address: "0x2E6318CC9006f132265fDBf9F68569172101Bb6f"
       abi: GambleBoard
@@ -15,6 +15,7 @@ dataSources:
       entities:
         - Bet
         - Event
+        - League
         - BetCreated
         - BetPlaced
         - BetRefund
@@ -22,6 +23,7 @@ dataSources:
         - BetVotedOn
         - Dispute
         - Evidence
+        - MetaEvidence
         - Ruling
       abis:
         - name: GambleBoard
@@ -41,6 +43,8 @@ dataSources:
           handler: handleDispute
         - event: Evidence(indexed address,indexed uint256,indexed address,string)
           handler: handleEvidence
+        - event: MetaEvidence(indexed uint256,string)
+          handler: handleMetaEvidence
         - event: Ruling(indexed address,indexed uint256,uint256)
           handler: handleRuling
       file: ./src/mappings/mapping.ts

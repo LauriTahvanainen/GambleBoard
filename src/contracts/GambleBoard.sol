@@ -30,7 +30,7 @@ contract GambleBoard is Arbitrable {
 
     uint256 private constant ONE_DAY = 86400;
 
-    uint8 private constant MAX_COUNTRIES = 200;
+    uint8 private constant MAX_COUNTRIES = 203;
 
     uint256 public constant RULING_OPTIONS_AMOUNT = 2; // 0 if can't arbitrate
 
@@ -109,7 +109,8 @@ contract GambleBoard is Arbitrable {
         uint16 category,
         uint256 stakingDeadline,
         uint256 timeToVote,
-        uint256 creatorOdd
+        uint256 creatorOdd,
+        string memory _metaEvidence
     ) public payable returns (uint256) {
         require(
             msg.value > MIN_STAKE,
@@ -120,7 +121,8 @@ contract GambleBoard is Arbitrable {
             stakingDeadline > block.timestamp,
             "Deadline to place stakes cannot be in the past!"
         );
-        require(timeToVote > ONE_DAY, "Time to vote should be atleast 1 day!");
+        require(country <= MAX_COUNTRIES, "Maximum country number is 203");
+        require(timeToVote >= ONE_DAY, "Time to vote should be more than 1 day!");
         uint256 betID = betsCreated++;
 
         Bet storage newBet = bets[betID];
@@ -139,6 +141,8 @@ contract GambleBoard is Arbitrable {
         newBet.votingDeadline = stakingDeadline + timeToVote;
 
         emit BetCreated(betID, country, league, category);
+        // Has to be done before the dispute is created
+        emit MetaEvidence(betID, _metaEvidence);
 
         return betID;
     }
@@ -265,7 +269,7 @@ contract GambleBoard is Arbitrable {
     // @title Creates a dispute in the arbitrator contract
     // Needs to deposit arbitration fee. The fee goes to the winner.
     // One player is enough to send the case to arbitration.
-    function createDispute(uint256 betID, string memory _metaEvidence)
+    function createDispute(uint256 betID)
         public
         payable
         onlyPlayer(betID)
@@ -287,9 +291,6 @@ contract GambleBoard is Arbitrable {
             bet.backerStake += msg.value;
         }
         bet.state = State.DISPUTED;
-
-        // Has to be done before the dispute is created
-        emit MetaEvidence(betID, _metaEvidence);
 
         uint256 disputeID =
             arbitrator.createDispute{value: msg.value}(

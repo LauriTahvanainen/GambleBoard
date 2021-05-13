@@ -464,6 +464,11 @@
 				"internalType": "uint256",
 				"name": "creatorOdd",
 				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "_metaEvidence",
+				"type": "string"
 			}
 		],
 		"name": "createBet",
@@ -483,11 +488,6 @@
 				"internalType": "uint256",
 				"name": "betID",
 				"type": "uint256"
-			},
-			{
-				"internalType": "string",
-				"name": "_metaEvidence",
-				"type": "string"
 			}
 		],
 		"name": "createDispute",

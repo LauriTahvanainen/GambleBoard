@@ -1,3 +1,4 @@
+import { BigInt } from "@graphprotocol/graph-ts";
 import {
   GambleBoard,
   BetCreated,
@@ -7,9 +8,10 @@ import {
   Evidence,
   Ruling,
   BetRefund,
-  BetVotedOn
+  BetVotedOn,
+  MetaEvidence,
 } from "../../generated/GambleBoard/GambleBoard"
-import { Bet, Event } from "../../generated/schema"
+import { Bet, Event, League } from "../../generated/schema"
 
 export function handleBetCreated(event: BetCreated): void {
   let betID = event.params.betID
@@ -37,17 +39,22 @@ export function handleBetCreated(event: BetCreated): void {
 
   betEntity.timeCreated = event.block.timestamp;
   betEntity.timeUpdated = event.block.timestamp;
+
   // Save the entity to the store
   betEntity.save()
 
-  let eventEntity = Event.load(betData.value9);
+  // Events
+  ///////////////////
+  let eventID = betData.value9 + BigInt.fromI32(event.params.country).toString() + BigInt.fromI32(event.params.category).toString()
+  let eventEntity = Event.load(eventID);
 
   if (eventEntity == null) {
-    eventEntity = new Event(betData.value9);
+    eventEntity = new Event(eventID);
+    eventEntity.description = betData.value9;
     eventEntity.startTime = betData.value0;
     eventEntity.betIDs = [];
   }
-  
+
   if (eventEntity.startTime > betData.value0) {
     eventEntity.startTime = betData.value0;
   }
@@ -60,6 +67,24 @@ export function handleBetCreated(event: BetCreated): void {
   eventEntity.betIDs = betIDs;
 
   eventEntity.save();
+
+  //Leagues of CategoryCountry pairs
+  //////////////////////
+  if (event.params.league !== "") {
+    let leagueID = BigInt.fromI32(event.params.country).toString() + BigInt.fromI32(event.params.category).toString() + event.params.league;
+    let leagueListEntity = League.load(leagueID);
+
+    if (leagueListEntity == null) {
+      leagueListEntity = new League(leagueID);
+    }
+
+    leagueListEntity.league = event.params.league;
+    leagueListEntity.category = event.params.category;
+    leagueListEntity.country = event.params.country;
+
+    leagueListEntity.save();
+  }
+
 }
 
 export function handleBetPlaced(event: BetPlaced): void {
@@ -156,7 +181,6 @@ export function handleEvidence(event: Evidence): void {
 
   // Bind the contract and get storage data about the bet
   let betContract = GambleBoard.bind(event.address);
-  let betData = betContract.bets(betID);
   let betEntity = new Bet(betID.toHex());
   betEntity.outcome = betContract.getOutcome(betID);
   betEntity.state = betContract.getState(betID);
@@ -166,4 +190,12 @@ export function handleEvidence(event: Evidence): void {
 
   // Save the entity to the store
   betEntity.save()
+}
+
+export function handleMetaEvidence(event: MetaEvidence): void {
+  let betEntity = new Bet(event.params._metaEvidenceID.toHex());
+
+  betEntity._metaEvidence = event.params._evidence;
+
+  betEntity.save();
 }
