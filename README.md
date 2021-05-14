@@ -54,7 +54,7 @@ Otherwise the client will complain about a CORS error.
    - `sudo apt-get install -y clang libpq-dev libssl-dev pkg-config`
 4. Install dependencies: `yarn`
 5. Generate mapping code from the contract ABI and the definitions in the subgraph.yaml file: `yarn codegen`
-6. clone https://github.com/graphprotocol/graph-node to own folder, and run `cargo build`. Some depencencies might need to be installed.
+6. clone https://github.com/graphprotocol/graph-node to own folder, and run `cargo build` in the folder. Some depencencies might need to be installed.
 7. In the graph-node folder run:
 
 ```
