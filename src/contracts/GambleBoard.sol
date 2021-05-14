@@ -14,7 +14,8 @@ import "./dep/Arbitrable.sol";
  * Agreement:         2
  * Disagreement:      3
  * Disputed:          4
- * Closed:            5
+ * Resolved:          5
+ * Refunded:          6
  *
  * @dev voteEvidence bool array holds information on if
  * creator and backer voted and if creator and backer provided evidence
@@ -25,7 +26,7 @@ contract GambleBoard is Arbitrable {
     bytes1 private constant CREATOR_PROVIDED_EVIDENCE = 0x04;
     bytes1 private constant BACKER_PROVIDED_EVIDENCE = 0x08;
 
-    enum State {OPEN, VOTING, AGREEMENT, DISAGREEMENT, DISPUTED, CLOSED}
+    enum State {OPEN, VOTING, AGREEMENT, DISAGREEMENT, DISPUTED, RESOLVED, REFUNDED}
     enum RulingOption {NO_OUTCOME, CREATOR_WINS, BACKER_WINS}
 
     uint256 private constant ONE_DAY = 86400;
@@ -218,9 +219,9 @@ contract GambleBoard is Arbitrable {
         Bet storage bet = bets[betID];
         require(bet.outcome == RulingOption.NO_OUTCOME, "Bet outcome defined");
         require(
-            (bet.state == State.VOTING &&
-                bet.votingDeadline < block.timestamp) ||
-                bet.state == State.AGREEMENT,
+            (bet.state == State.VOTING && bet.votingDeadline < block.timestamp) ||
+            bet.state == State.AGREEMENT ||
+            (bet.state == State.OPEN && bet.stakingDeadline < block.timestamp),
             "Refund not possible"
         );
 
@@ -234,8 +235,8 @@ contract GambleBoard is Arbitrable {
             payable(msg.sender).transfer(amountTransfer);
         }
 
-        if (bet.backerStake == 0 && bet.creatorStake == 0) {
-            bet.state = State.CLOSED;
+        if ((bet.backerStake == 0 && bet.creatorStake == 0) || bet.state == State.OPEN) {
+            bet.state = State.REFUNDED;
         }
 
         emit BetRefund(betID, bet.state, bet.backerStake, bet.creatorStake);
@@ -255,7 +256,7 @@ contract GambleBoard is Arbitrable {
         require(bet.outcome != RulingOption.NO_OUTCOME);
 
         uint256 amountTransfer = bet.creatorStake + bet.backerStake;
-        bet.state = State.CLOSED;
+        bet.state = State.RESOLVED;
 
         if (bet.outcome == RulingOption.CREATOR_WINS) {
             bet.creator.transfer(amountTransfer);
@@ -367,3 +368,4 @@ contract GambleBoard is Arbitrable {
         revert("Cant send ETH to contract address!");
     }
 }
+
