@@ -95,7 +95,7 @@ EOF
 
 This will also spin up a GraphiQL interface at `http://127.0.0.1:8000/`.
 
-8. Deploy our subgraph to the local node:
+8. Inside the GambleBoard folder, deploy the subgraph to the local node:
 
 ```
 yarn create-local
