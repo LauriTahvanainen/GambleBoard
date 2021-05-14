@@ -52,10 +52,8 @@ Otherwise the client will complain about a CORS error.
 2. (NOTICE: The node documentation tells you to do it this way, but when you install PostgreSQL, it creates a default databasecluster. You could use that and run `createdb graph-node` on that skipping the first two commands. Commands should also be given as the user: postgres) PostgreSQL: In the folder where you want to save the database run `initdb -D .postgres` followed by `pg_ctl -D .postgres -l logfile start` and `createdb graph-node`. This starts the PostgreSQL service that listens on port 5432 and initializes a PostgreSQL database named graph-node
 3. If using Ubuntu, you may need to install additional packages:
    - `sudo apt-get install -y clang libpq-dev libssl-dev pkg-config`
-4. Install dependencies: `yarn`
-5. Generate mapping code from the contract ABI and the definitions in the subgraph.yaml file: `yarn codegen`
-6. clone https://github.com/graphprotocol/graph-node to own folder, and run `cargo build` in the folder. Some depencencies might need to be installed.
-7. In the graph-node folder run:
+4. clone https://github.com/graphprotocol/graph-node to own folder, and run `cargo build` in the folder. Some depencencies might need to be installed.
+5. In the graph-node folder run:
 
 ```
 cargo run -p graph-node --release -- 
@@ -92,7 +90,10 @@ EOF
 
 This will also spin up a GraphiQL interface at `http://127.0.0.1:8000/`.
 
-8. Inside the GambleBoard folder, deploy the subgraph to the local node:
+6. Inside the GambleBoard folder, install dependencies: `yarn`
+7. Generate mapping code from the contract ABI and the definitions in the subgraph.yaml file: `yarn codegen`
+
+8. deploy the subgraph to the local node:
 
 ```
 yarn create-local
