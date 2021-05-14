@@ -67,7 +67,7 @@ cargo run -p graph-node --release --
 For example:
 
 ```
-cargo run -p graph-node --release -- --postgres-url postgresql://postgres:postgres@localhost:5432/graph-node --ethereum-rpc ganache-cli:http://127.0.0.1:8545 --ipfs 127.0.0.1:5001 --debug
+cargo run -p graph-node --release -- --postgres-url postgresql://postgres:postgres@localhost:5432/graph-node --ethereum-rpc ganache:http://127.0.0.1:8545 --ipfs 127.0.0.1:5001 --debug
 ```
 
 Try your OS username as `USERNAME` and `PASSWORD`. For details on setting
