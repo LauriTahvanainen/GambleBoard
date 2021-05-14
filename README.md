@@ -24,7 +24,7 @@ Install:
 
 #### Contract
 
-Use for example the [Remix IDE](https://remix.ethereum.org) to edit and deploy the contracts to the Ganache blockchain. Then copy the address of the contract to the `subgraph.yaml file`.
+Use for example the [Remix IDE](https://remix.ethereum.org) to edit and deploy the contracts to the Ganache blockchain. Then copy the address of the contract to the `subgraph.yaml file`. To use the hard coded addresses in the code, use the memonic in [here](https://github.com/LauriTahvanainen/GambleBoard/blob/main/TestInput/Input.txt) to create the Ganache chain account. Import the first account to metamask. Deploy first the centralized arbitrator, and then the GambleBoard contrast.
 
 #### Local Graph Node Deployment Steps
 
