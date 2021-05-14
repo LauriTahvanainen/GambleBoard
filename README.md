@@ -58,18 +58,18 @@ Otherwise the client will complain about a CORS error.
 7. In the graph-node folder run:
 
 ```
-cargo run -p graph-node --release -- \
-  --postgres-url postgresql://USERNAME[:PASSWORD]@localhost:5432/graph-node \
-  --ethereum-rpc [URL] \
+cargo run -p graph-node --release -- 
+  --postgres-url postgresql://USERNAME[:PASSWORD]@localhost:5432/graph-node 
+  --ethereum-rpc [URL] 
   --ipfs 127.0.0.1:5001
 ```
 
 For example:
 
 ```
-cargo run -p graph-node --release \ 
-  -- --postgres-url postgresql://postgres:postgres@localhost:5432/graph-node \ 
-  --ethereum-rpc ganache-cli:http://127.0.0.1:8545 \ 
+cargo run -p graph-node --release 
+  -- --postgres-url postgresql://postgres:postgres@localhost:5432/graph-node 
+  --ethereum-rpc ganache-cli:http://127.0.0.1:8545 
   --ipfs 127.0.0.1:5001 --debug
 ```
 
