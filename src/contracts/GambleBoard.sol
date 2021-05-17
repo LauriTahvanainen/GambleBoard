@@ -212,7 +212,7 @@ contract GambleBoard is Arbitrable {
             bet.voteEvidenceBools = bet.voteEvidenceBools | BACKER_VOTED;
         }
 
-        if (bet.outcome == RulingOption.NO_OUTCOME) {
+        if (uint8(bet.voteEvidenceBools) < 3) {
             bet.outcome = outcome;
         } else {
             if (bet.outcome == outcome) {
@@ -408,3 +408,4 @@ contract GambleBoard is Arbitrable {
         revert("Cant send ETH to contract address!");
     }
 }
+
