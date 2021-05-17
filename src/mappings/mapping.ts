@@ -175,6 +175,7 @@ export function handleRuling(event: Ruling): void {
 
   betEntity.timeUpdated = event.block.timestamp;
 
+  betEntity.save();
 }
 
 export function handleDispute(event: Dispute): void {
