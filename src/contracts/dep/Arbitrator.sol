@@ -69,7 +69,7 @@ abstract contract Arbitrator {
      *  @param _disputeID ID of the dispute to be appealed.
      *  @param _extraData Can be used to give extra info on the appeal.
      */
-    function appeal(uint _disputeID, bytes memory _extraData) public requireAppealFee(_disputeID,_extraData) payable {
+    function appeal(uint _disputeID, bytes memory _extraData) public virtual requireAppealFee(_disputeID,_extraData) payable {
         emit AppealDecision(_disputeID, Arbitrable(msg.sender));
     }
 
@@ -84,7 +84,7 @@ abstract contract Arbitrator {
      *  @param _disputeID ID of the dispute.
      *  @return start : end The start and end of the period.
      */
-    function appealPeriod(uint _disputeID) public view returns(uint start, uint end) {}
+    function appealPeriod(uint _disputeID) public virtual view returns(uint start, uint end) {}
 
     /** @dev Return the status of a dispute.
      *  @param _disputeID ID of the dispute to rule.
