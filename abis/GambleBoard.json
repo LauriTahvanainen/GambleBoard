@@ -317,6 +317,44 @@
 				"type": "uint256"
 			}
 		],
+		"name": "backerHasProvidedEvidence",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "betID",
+				"type": "uint256"
+			}
+		],
+		"name": "backerHasVoted",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "betID",
+				"type": "uint256"
+			}
+		],
 		"name": "betExists",
 		"outputs": [
 			{
@@ -505,6 +543,44 @@
 		"inputs": [
 			{
 				"internalType": "uint256",
+				"name": "betID",
+				"type": "uint256"
+			}
+		],
+		"name": "creatorHasProvidedEvidence",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "betID",
+				"type": "uint256"
+			}
+		],
+		"name": "creatorHasVoted",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
 				"name": "",
 				"type": "uint256"
 			}
@@ -553,25 +629,6 @@
 				"internalType": "uint8",
 				"name": "",
 				"type": "uint8"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "betID",
-				"type": "uint256"
-			}
-		],
-		"name": "getVoteEvidenceBools",
-		"outputs": [
-			{
-				"internalType": "bytes8",
-				"name": "",
-				"type": "bytes8"
 			}
 		],
 		"stateMutability": "view",

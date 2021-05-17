@@ -8,7 +8,6 @@ type Bet @entity {
   backerStake: BigInt!
   outcome: Int!
   state: Int!
-  voteEvidenceBools: Bytes!
   stakingDeadline: BigInt!
   votingDeadline: BigInt!
   description: String!
@@ -19,6 +18,11 @@ type Bet @entity {
   disputeID: BigInt
   _metaEvidence: String
   event: Event!
+  creatorBacker: String!
+  creatorHasVoted: Boolean!
+  backerHasVoted: Boolean!
+  creatorProvidedEvidence: Boolean!
+  backerProvidedEvidence: Boolean!
 }
 
 type Event @entity {

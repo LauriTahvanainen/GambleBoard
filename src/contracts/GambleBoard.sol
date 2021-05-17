@@ -26,7 +26,15 @@ contract GambleBoard is Arbitrable {
     bytes1 private constant CREATOR_PROVIDED_EVIDENCE = 0x04;
     bytes1 private constant BACKER_PROVIDED_EVIDENCE = 0x08;
 
-    enum State {OPEN, VOTING, AGREEMENT, DISAGREEMENT, DISPUTED, RESOLVED, REFUNDED}
+    enum State {
+        OPEN,
+        VOTING,
+        AGREEMENT,
+        DISAGREEMENT,
+        DISPUTED,
+        RESOLVED,
+        REFUNDED
+    }
     enum RulingOption {NO_OUTCOME, CREATOR_WINS, BACKER_WINS}
 
     uint256 private constant ONE_DAY = 86400;
@@ -123,7 +131,10 @@ contract GambleBoard is Arbitrable {
             "Deadline to place stakes cannot be in the past!"
         );
         require(country <= MAX_COUNTRIES, "Maximum country number is 203");
-        require(timeToVote >= ONE_DAY, "Time to vote should be more than 1 day!");
+        require(
+            timeToVote >= ONE_DAY,
+            "Time to vote should be more than 1 day!"
+        );
         uint256 betID = betsCreated++;
 
         Bet storage newBet = bets[betID];
@@ -219,9 +230,11 @@ contract GambleBoard is Arbitrable {
         Bet storage bet = bets[betID];
         require(bet.outcome == RulingOption.NO_OUTCOME, "Bet outcome defined");
         require(
-            (bet.state == State.VOTING && bet.votingDeadline < block.timestamp) ||
-            bet.state == State.AGREEMENT ||
-            (bet.state == State.OPEN && bet.stakingDeadline < block.timestamp),
+            (bet.state == State.VOTING &&
+                bet.votingDeadline < block.timestamp) ||
+                bet.state == State.AGREEMENT ||
+                (bet.state == State.OPEN &&
+                    bet.stakingDeadline < block.timestamp),
             "Refund not possible"
         );
 
@@ -235,7 +248,10 @@ contract GambleBoard is Arbitrable {
             payable(msg.sender).transfer(amountTransfer);
         }
 
-        if ((bet.backerStake == 0 && bet.creatorStake == 0) || bet.state == State.OPEN) {
+        if (
+            (bet.backerStake == 0 && bet.creatorStake == 0) ||
+            bet.state == State.OPEN
+        ) {
             bet.state = State.REFUNDED;
         }
 
@@ -344,7 +360,7 @@ contract GambleBoard is Arbitrable {
     }
 
     function betExists(uint256 betID) public view returns (bool) {
-        return bets[betID].creator == address(0x00);
+        return bets[betID].creator != address(0x00);
     }
 
     function getState(uint256 betID) public view returns (uint8) {
@@ -355,8 +371,32 @@ contract GambleBoard is Arbitrable {
         return uint8(bets[betID].outcome);
     }
 
-    function getVoteEvidenceBools(uint256 betID) public view returns (bytes8) {
-        return bets[betID].voteEvidenceBools;
+    function creatorHasVoted(uint256 betID) public view returns (bool) {
+        return ((bets[betID].voteEvidenceBools & CREATOR_VOTED) ==
+            CREATOR_VOTED);
+    }
+
+    function backerHasVoted(uint256 betID) public view returns (bool) {
+        return ((bets[betID].voteEvidenceBools & BACKER_VOTED) == BACKER_VOTED);
+    }
+
+    function creatorHasProvidedEvidence(uint256 betID)
+        public
+        view
+        returns (bool)
+    {
+        return
+            (bets[betID].voteEvidenceBools & CREATOR_PROVIDED_EVIDENCE) ==
+            CREATOR_PROVIDED_EVIDENCE;
+    }
+
+    function backerHasProvidedEvidence(uint256 betID)
+        public
+        view
+        returns (bool)
+    {
+        return (bets[betID].voteEvidenceBools & BACKER_PROVIDED_EVIDENCE) ==
+            BACKER_PROVIDED_EVIDENCE;
     }
 
     //Fallback functions if someone only sends ether to the contract address
@@ -368,4 +408,3 @@ contract GambleBoard is Arbitrable {
         revert("Cant send ETH to contract address!");
     }
 }
-
