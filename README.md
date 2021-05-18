@@ -1,6 +1,8 @@
 # GambleBoard
 
-A decentralized betting platform!
+A decentralized betting platform on the Ethereum blockchain! 
+
+Implements the [Arbitration standard](https://github.com/ethereum/EIPs/issues/792) and uses [The Graph Protocol](https://thegraph.com/) for indexing.
 
 [Requirements](https://github.com/LauriTahvanainen/GambleBoard/edit/main/documentation/requirements.md)
 
