@@ -18,28 +18,31 @@ The platform itself offers several kinds of bets which are listed under differen
 
 A bet pool is created by a interaction with a smart contract. In a simple 1v1 pool the creator configures the pool with two outcomes, adds stake on one outcome and waits for someone to agree on the odds and provide their stake. The stakes would then be locked in the pool for a certain time or until both parties vote on the result. When the outcome is known, both parties interact with the contract to broadcast their opinion on the result. If these opinions match the rewards are delegated to the winner accordingly. If Kleros is not used and there are no bets on the winning outcome, the stakes are returned to the players.
 
-### *Optional*
+### *Optional* (Not implemented)
 Further the layer of the bet decides between making the bet private or public. Private bets are accessible through invitation. There is also the option that the lay side offers a bet which can be backed by many players with a share of the total bet at the same time. This option increases the chance of a bet with high stakes to come off. The payoffs would then depend on how big the share of the respective player is.
 
-### *Optional*
+### *Optional* (Implemented)
 If there is an dispute on the result, the contract will automatically, or with the interraction of one player, send the dispute to Kleros court for arbitration. At this point both parties could provide evidence or the users could have defined some sources for the events result, which are sent to the Kleros jury. The jury will make a decision and the smart contract will react to the decision awarding the winner and punishing the other. For the pool to use Kleros there needs to be certain amount of stake locked for a possible court case. In addition a percentage of 5% of the stake of the user who is wrong will be charged.
 
-### *Optional*
+### *Optional* (Not Implemented)
 There are some rules with how to solve disagreement on bets. In a one to one bet the bet will go automatically to Kleros is there is a disagreement. For one to many bet there is the rule that on the many side at least 75% percent of the users have to agree on the outcome, otherwise the case will go to Kleros.
 
-### *Optional*
+### *Optional* (Not Implemented)
 Furthermore there users will be rated by the system and get ratings from other users. After a bet is over upon agreement, both users get an increase of their rating depending on the stake. On the other hand if the bet is moved to Klerus the user who was wrong will be punishes with a lower rating accordingly. Users with high rating can also be offered to become a moderator which allows them to remove bets with inappropriate content reported by users.
 
-### *Optional*
+### *Optional* (Not Implemented)
 Private bets are not visible for users without an invitation.
 
-### *Optional*
+### *Optional* (Not Implemented)
 Parimutual bets
 Next step would be to offer Parimutual bets on our platform. Parimutual bets can also be layed and backed. The same rules that are defined for P2P bets apply for Parimutual bets.
 
 ## Use case summary
 The minimum requirement is thus for the players to be able to create 1v1 "back" and "lay" bets, for which the result is agreed upon between the players. The winning are spread accordingly according to the agreement of the players. Without Kleros, in a case of dispute the players bets are returned. The smart constract allows creation of any kind of bets, but the minimum requirement for the user interface is that there are match templates offered in the UI to the players, and from those matches the players can create bets with their preferred odds. The players can also open a listing of created bets where they can select what match to bet on and with what odds.
 All the optional marked use cases will be developed on top of the minimum requirements if there is sufficient time. These include for example the Kleros arbitration for disagreements and the possibility to create any kind of bet in the UI.
+
+### The current implementation
+A player can either create a bet or back on an existing one. All bets are 1v1 binary (Outcome yes/no depending on the creators bet description) bets. All bets have an arbitrator as an backup if there is a disagreement. One player can send the bet to arbitration. Bets have attached to them the country, category and league. These are used for filtering the bets in the UI. There is also an event entity built by grouping the bets that have the same description, date, country, category and league under the event. Users can thus search bets by events. For creating the bet, the creator can define almost any type of bet. Country and category are chosen from a predefined set of options in the UI, league can be given arbitrarily. The bet description and the outcome to bet on can be decided arbitrarily.
 
 ## 1.2 Implementation
 
