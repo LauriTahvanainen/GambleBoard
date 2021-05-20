@@ -2,7 +2,7 @@
 
 |Goal|Dev|Workload|Deadline|Done|
 |----|---|--------|--------|----|
-|As a user I want a Homepage where I can search listed event and bets under those events |Rez||||
+|As a user I want a Homepage where I can search listed event and bets under those events |Rez|||x|
 - Categories by Country, Sport, League
 - Two view levels of an event. There can be many open bets on different outcomes under the same event: e.g. Basel vs Zurich
   - More broad view of only event description: e.g. Zurich vs Basel
@@ -20,7 +20,7 @@
 
 |Goal|Dev|Workload|Deadline|Done|
 |----|---|--------|--------|----|
-|As a user I want see my Betting history|Ronin||||
+|As a user I want see my Betting history|Ronin|||x|
 - Access from the front page
 - Ability to vote on outcome of a bet.
 - Ability to dispute a result (Optional)
@@ -28,7 +28,7 @@
 
 |Goal|Dev|Workload|Deadline|Done|
 |----|---|--------|--------|----|
-|As a user I want to be able to create a “lay” bet pool|Lauri||||
+|As a user I want to be able to create a “lay” bet pool|Lauri|||x|
 - 1 player / outcome
 - Enter amount of ether and outcome selected by the creator
 - Fixed odds
@@ -38,14 +38,14 @@
 
 |Goal|Dev|Workload|Deadline|Done|
 |----|---|--------|--------|----|
-|As a user I want to be able to place a bet on “back” bet pools|Ronin||||
+|As a user I want to be able to place a bet on “back” bet pools|Ronin|||x|
 - Display and selection of  a league on which I want to bet
 - Odd and fixed stake shown.
 - 1 backer / bet.
 
 |Goal|Dev|Workload|Deadline|Done|
 |----|---|--------|--------|----|
-|As a user I want to vote on the outcome|Martin||||
+|As a user I want to vote on the outcome|Martin|||x|
 - Receive back the bet-money if dispute without Kleros (or able to claim winning with another transaction)
 - If there is not a backer, creator can withdraw own stake.
 - Option for voting undecidable e.g. for cancelled matches.
@@ -55,7 +55,7 @@
 
 |Goal|Dev|Workload|Deadline|Done|
 |----|---|--------|--------|----|
-|As a user I want to dispute the result (Optional)|Lauri||||
+|As a user I want to dispute the result (Optional)|Lauri|||x|
 - Give an evidence of the wrong result
 - Only if the player has a bet on the match.
 - Ruling done automatically
