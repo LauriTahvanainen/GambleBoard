@@ -10,6 +10,8 @@ Implements the [Arbitration](https://github.com/ethereum/EIPs/issues/792) and [E
 
 Deploying the project locally:
 
+Has been successfully deployed with Windows 10 and Ubuntu 20.
+
 #### Dependencies
 
 Install:
