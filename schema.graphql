@@ -26,7 +26,7 @@ type Bet @entity {
 }
 
 type Event @entity {
-  id: ID! # set to EventDescription-Country-Category
+  id: ID! # set to EventDescription-Country-Category-Date
   description: String!
   startTime: BigInt!
   league: String! 
