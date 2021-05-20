@@ -4,7 +4,11 @@ A decentralized betting platform on the Ethereum blockchain!
 
 Implements the [Arbitration](https://github.com/ethereum/EIPs/issues/792) and [Evidence](https://github.com/ethereum/EIPs/issues/1497) standards and uses [The Graph Protocol](https://thegraph.com/) for indexing.
 
+## Documentation
+
 [Requirements](https://github.com/LauriTahvanainen/GambleBoard/edit/main/documentation/requirements.md)
+
+[Final report](https://github.com/LauriTahvanainen/GambleBoard/blob/main/documentation/FS21_6_GambleBoard_Documentation_final.pdf)
 
 ## Running
 
